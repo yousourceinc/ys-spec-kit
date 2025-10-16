@@ -7,6 +7,33 @@ All notable changes to the Specify CLI will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.4] - 2025-10-17
+
+### Changed
+
+- **CLI branding**: Updated ASCII banner to include "YS" (YourSource) branding
+- **Tagline**: Changed to "YourSource Spec Kit - Spec-Driven Development Toolkit"
+
+## [0.3.3] - 2025-10-16
+
+### Fixed
+
+- **Post-install script**: Corrected git repository URL in install-python-cli.js
+- **Python CLI installation**: Now properly installs from yousourceinc/ys-spec-kit repository
+
+## [0.3.2] - 2025-10-16
+
+### Changed
+
+- **npm registry**: Explicitly configured publishConfig for public npm registry
+- **Package configuration**: Updated repository URL to yousourceinc organization
+- **Version**: Bumped to 0.3.2 for npm publication fixes
+
+### Fixed
+
+- **npm publication**: Fixed registry configuration to properly publish to registry.npmjs.org
+- **Package metadata**: Corrected repository URL and author information
+
 ## [0.3.0] - 2025-10-16
 
 ### Added

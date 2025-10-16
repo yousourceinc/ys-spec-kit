@@ -1,7 +1,7 @@
 {
-  "name": "@your-org/specify-cli",
-  "version": "0.3.0",
-  "description": "Specify CLI - Spec-Driven Development with OAuth authentication (YourOrg fork)",
+  "name": "@yousourceinc/specify-cli",
+  "version": "0.3.4",
+  "description": "YourSource Specify CLI - Spec-Driven Development with OAuth authentication",
   "main": "bin/specify.js",
   "bin": {
     "specify": "./bin/specify.js"
@@ -16,13 +16,21 @@
     "ai-assisted-development",
     "specification",
     "compliance",
-    "cli"
+    "cli",
+    "github-copilot",
+    "claude",
+    "cursor",
+    "yousource"
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/your-org/ys-spec-kit.git"
+    "url": "https://github.com/yousourceinc/ys-spec-kit.git"
   },
-  "author": "YourOrg",
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org"
+  },
+  "author": "YourSource",
   "license": "Apache-2.0",
   "engines": {
     "node": ">=16.0.0"

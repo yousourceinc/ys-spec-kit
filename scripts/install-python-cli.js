@@ -70,7 +70,7 @@ try {
   } else {
     // Production: Install from git
     console.log('Production mode: Installing from git repository');
-    const gitUrl = 'git+https://github.com/your-org/ys-spec-kit.git@main';
+    const gitUrl = 'git+https://github.com/yousourceinc/ys-spec-kit.git@main';
     execSync(`${pythonCmd} -m pip install --user "${gitUrl}"`, {
       stdio: 'inherit'
     });
@@ -84,6 +84,6 @@ try {
 } catch (error) {
   console.error('\n❌ Installation failed:', error.message);
   console.error('\nTry manual installation:');
-  console.error(`  ${pythonCmd} -m pip install --user git+https://github.com/your-org/ys-spec-kit.git@main`);
+  console.error(`  ${pythonCmd} -m pip install --user git+https://github.com/yousourceinc/ys-spec-kit.git@main`);
   process.exit(1);
 }

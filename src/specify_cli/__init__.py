@@ -87,15 +87,15 @@ CLAUDE_LOCAL_PATH = Path.home() / ".claude" / "local" / "claude"
 
 # ASCII Art Banner
 BANNER = """
-███████╗██████╗ ███████╗ ██████╗██╗███████╗██╗   ██╗
-██╔════╝██╔══██╗██╔════╝██╔════╝██║██╔════╝╚██╗ ██╔╝
-███████╗██████╔╝█████╗  ██║     ██║█████╗   ╚████╔╝ 
-╚════██║██╔═══╝ ██╔══╝  ██║     ██║██╔══╝    ╚██╔╝  
-███████║██║     ███████╗╚██████╗██║██║        ██║   
-╚══════╝╚═╝     ╚══════╝ ╚═════╝╚═╝╚═╝        ╚═╝   
+██╗   ██╗███████╗    ███████╗██████╗ ███████╗ ██████╗██╗███████╗██╗   ██╗
+╚██╗ ██╔╝██╔════╝    ██╔════╝██╔══██╗██╔════╝██╔════╝██║██╔════╝╚██╗ ██╔╝
+ ╚████╔╝ ███████╗    ███████╗██████╔╝█████╗  ██║     ██║█████╗   ╚████╔╝ 
+  ╚██╔╝  ╚════██║    ╚════██║██╔═══╝ ██╔══╝  ██║     ██║██╔══╝    ╚██╔╝  
+   ██║   ███████║    ███████║██║     ███████╗╚██████╗██║██║        ██║   
+   ╚═╝   ╚══════╝    ╚══════╝╚═╝     ╚══════╝ ╚═════╝╚═╝╚═╝        ╚═╝   
 """
 
-TAGLINE = "GitHub Spec Kit - Spec-Driven Development Toolkit"
+TAGLINE = "YourSource Spec Kit - Spec-Driven Development Toolkit"
 class StepTracker:
     """Track and render hierarchical steps without emojis, similar to Claude Code tree output.
     Supports live auto-refresh via an attached refresh callback.
