@@ -45,16 +45,19 @@ async function main() {
 function runPythonCLI(args) {
   // Try to find Python 3
   const pythonCommands = ['python3', 'python'];
-  let pythonCmd = 'python3';
+  let pythonCmd = null;
+  let pythonBinDir = null;
   
-  // Check which Python command is available
+  // Check which Python command is available and get its bin directory
   for (const cmd of pythonCommands) {
     try {
-      const result = require('child_process').spawnSync(cmd, ['--version'], { 
-        stdio: 'pipe' 
+      const result = require('child_process').spawnSync(cmd, ['-c', 'import sys, os; print(os.path.dirname(sys.executable))'], { 
+        stdio: 'pipe',
+        encoding: 'utf-8'
       });
-      if (result.status === 0) {
+      if (result.status === 0 && result.stdout) {
         pythonCmd = cmd;
+        pythonBinDir = result.stdout.trim();
         break;
       }
     } catch (e) {
@@ -62,10 +65,42 @@ function runPythonCLI(args) {
     }
   }
   
-  const specify = spawn(pythonCmd, ['-m', 'specify_cli', ...args], {
-    stdio: 'inherit',
-    env: { ...process.env }
-  });
+  if (!pythonCmd) {
+    console.error('❌ Python 3 not found');
+    console.error('Please install Python 3.11+ from https://python.org');
+    process.exit(1);
+  }
+  
+  // Try to find specify command in Python's user bin directory
+  const { execSync } = require('child_process');
+  let specifyPath = null;
+  
+  try {
+    const userBase = execSync(`${pythonCmd} -m site --user-base`, { encoding: 'utf-8' }).trim();
+    const userBinDir = path.join(userBase, 'bin');
+    const potentialPath = path.join(userBinDir, 'specify');
+    
+    if (require('fs').existsSync(potentialPath)) {
+      specifyPath = potentialPath;
+    }
+  } catch (e) {
+    // Fall back to calling Python module directly
+  }
+  
+  // If specify script exists, call it directly; otherwise use python -c to import and run
+  let specify;
+  if (specifyPath) {
+    specify = spawn(specifyPath, args, {
+      stdio: 'inherit',
+      env: { ...process.env }
+    });
+  } else {
+    // Fall back to calling the main function via Python
+    specify = spawn(pythonCmd, ['-c', 'from specify_cli import main; main()', ...args], {
+      stdio: 'inherit',
+      env: { ...process.env }
+    });
+  }
   
   specify.on('close', (code) => {
     process.exit(code || 0);
@@ -73,8 +108,8 @@ function runPythonCLI(args) {
   
   specify.on('error', (error) => {
     if (error.code === 'ENOENT') {
-      console.error('❌ Python 3 not found');
-      console.error('Please install Python 3.11+ from https://python.org');
+      console.error('❌ Specify CLI not found');
+      console.error('Please ensure the Python package is installed');
     } else {
       console.error('Error running Specify CLI:', error.message);
     }
