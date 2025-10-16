@@ -10,9 +10,44 @@ The toolkit supports multiple AI coding assistants, allowing teams to use their 
 
 ---
 
+## OAuth Authentication & Distribution
+
+Specify CLI includes built-in GitHub OAuth support for secure team distribution via npm. This enables:
+
+- **Browser-based OAuth flow** - Automatic browser opening for user authentication
+- **Device code flow** - Support for SSH, headless, and remote environments
+- **Organization verification** - Automatic checks for organization membership
+- **Secure token storage** - Tokens stored with restricted file permissions (mode 600)
+- **Cross-platform support** - Works on macOS, Linux, and Windows (with WSL2)
+
+### Implementation Details
+
+**OAuth Module:** `src/auth/github-oauth.js` (467 lines)
+- Handles GitHub OAuth 2.0 authentication flow
+- Automatic environment detection (GUI vs SSH/headless)
+- Token management and persistence
+- Organization membership verification
+
+**Node.js Wrapper:** `bin/specify.js`
+- Entry point for npm-installed Specify CLI
+- Runs OAuth authentication before command execution
+- Automatically detects available Python interpreter
+- Seamless integration with existing Python CLI
+
+**Distribution:** Ready for `npm publish`
+- Package name: `@your-org/specify-cli`
+- Post-install script automatically sets up Python CLI
+- Complete documentation for team onboarding
+
+See [OAuth Setup Guide](./docs/OAUTH_SETUP.md) and [Team Installation Guide](./docs/TEAM_INSTALLATION.md) for setup and usage details.
+
+---
+
 ## General practices
 
 - Any changes to `__init__.py` for the Specify CLI require a version rev in `pyproject.toml` and addition of entries to `CHANGELOG.md`.
+- When implementing OAuth authentication, update both Node.js wrapper and Python CLI to maintain consistency
+- OAuth credentials should be stored securely and never committed to version control
 
 ## Adding New Agent Support
 

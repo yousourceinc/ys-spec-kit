@@ -18,7 +18,8 @@
 - [⚡ Get started](#-get-started)
 - [📽️ Video Overview](#️-video-overview)
 - [🤖 Supported AI Agents](#-supported-ai-agents)
-- [🔧 Specify CLI Reference](#-specify-cli-reference)
+- [� GitHub OAuth Authentication](#-github-oauth-authentication)
+- [�🔧 Specify CLI Reference](#-specify-cli-reference)
 - [📚 Core philosophy](#-core-philosophy)
 - [🌟 Development phases](#-development-phases)
 - [🎯 Experimental goals](#-experimental-goals)
@@ -29,7 +30,7 @@
 - [👥 Maintainers](#-maintainers)
 - [💬 Support](#-support)
 - [🙏 Acknowledgements](#-acknowledgements)
-- [📄 License](#-license)
+- [📄 License](#-📄-license)
 
 ## 🤔 What is Spec-Driven Development?
 
@@ -41,7 +42,28 @@ Spec-Driven Development **flips the script** on traditional software development
 
 Choose your preferred installation method:
 
-#### Option 1: Persistent Installation (Recommended)
+#### Option 1: npm Installation (Recommended for Teams with OAuth)
+
+Install via npm with automatic GitHub OAuth authentication:
+
+```bash
+npm install -g @your-org/specify-cli
+```
+
+Then use the tool directly:
+
+```bash
+specify init <PROJECT_NAME>
+specify check
+```
+
+**This option includes:**
+- Automatic GitHub OAuth authentication
+- Team access control
+- Pre-configured organization verification
+- Works in terminal environments (both GUI and SSH)
+
+#### Option 2: uv Installation (Traditional Persistent)
 
 Install once and use everywhere:
 
@@ -56,7 +78,7 @@ specify init <PROJECT_NAME>
 specify check
 ```
 
-#### Option 2: One-time Usage
+#### Option 3: One-time Usage with uv
 
 Run directly without installing:
 
@@ -136,6 +158,21 @@ Want to see Spec Kit in action? Watch our [video overview](https://www.youtube.c
 | [Amazon Q Developer CLI](https://aws.amazon.com/developer/learning/q-developer-cli/) | ⚠️ | Amazon Q Developer CLI [does not support](https://github.com/aws/amazon-q-developer-cli/issues/3064) custom arguments for slash commands. |
 | [Codex CLI](https://github.com/openai/codex)              | ⚠️ | Codex [does not support](https://github.com/openai/codex/issues/2890) custom arguments for slash commands.  |
 
+## 🔐 GitHub OAuth Authentication
+
+Specify CLI can be configured with GitHub OAuth for team access control and secure distribution. This is especially useful for organizations that want to:
+
+- **Control team access** - Verify organization membership automatically
+- **Secure distribution** - Distribute Specify CLI via npm with built-in authentication
+- **Support multiple environments** - Works in both GUI (browser-based) and SSH/headless (device code flow) environments
+- **Manage credentials safely** - Tokens stored securely with restricted file permissions
+
+### OAuth Setup
+
+For detailed OAuth setup instructions, see [OAuth Setup Guide](./docs/OAUTH_SETUP.md).
+
+**For Teams:** See [Team Installation Guide](./docs/TEAM_INSTALLATION.md) for complete onboarding instructions.
+
 ## 🔧 Specify CLI Reference
 
 The `specify` command supports the following options:
@@ -146,6 +183,7 @@ The `specify` command supports the following options:
 |-------------|----------------------------------------------------------------|
 | `init`      | Initialize a new Specify project from the latest template      |
 | `check`     | Check for installed tools (`git`, `claude`, `gemini`, `code`/`code-insiders`, `cursor-agent`, `windsurf`, `qwen`, `opencode`, `codex`) |
+| `logout`    | Clear GitHub OAuth authentication and remove stored token      |
 
 ### `specify init` Arguments & Options
 
@@ -270,9 +308,10 @@ Our research and experimentation focus on:
 
 - **Linux/macOS** (or WSL2 on Windows)
 - AI coding agent: [Claude Code](https://www.anthropic.com/claude-code), [GitHub Copilot](https://code.visualstudio.com/), [Gemini CLI](https://github.com/google-gemini/gemini-cli), [Cursor](https://cursor.sh/), [Qwen CLI](https://github.com/QwenLM/qwen-code), [opencode](https://opencode.ai/), [Codex CLI](https://github.com/openai/codex), [Windsurf](https://windsurf.com/), or [Amazon Q Developer CLI](https://aws.amazon.com/developer/learning/q-developer-cli/)
-- [uv](https://docs.astral.sh/uv/) for package management
 - [Python 3.11+](https://www.python.org/downloads/)
 - [Git](https://git-scm.com/downloads)
+- [Node.js 16+](https://nodejs.org/) (required for npm distribution with OAuth authentication)
+- [uv](https://docs.astral.sh/uv/) for package management (optional, only needed for `uv` installation method)
 
 If you encounter issues with an agent, please open an issue so we can refine the integration.
 

@@ -1,0 +1,92 @@
+# Don't include in npm package
+
+# Python source (will be installed via pip)
+src/specify_cli/
+
+# Git
+.git/
+.github/
+.gitignore
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Node
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Documentation (keep essentials)
+docs/
+!docs/OAUTH_SETUP.md
+!docs/TEAM_INSTALLATION.md
+
+# Scripts (except install script)
+scripts/bash/
+scripts/powershell/
+
+# Templates (not needed for npm users)
+templates/
+
+# Media
+media/
+
+# Test files
+tests/
+test/
+
+# Misc
+*.md
+!README.md
+!NPM_README.md
+!CHANGELOG.md
+!LICENSE
+memory/
+.genreleases/
+pyproject.toml
+SECURITY.md
+CODE_OF_CONDUCT.md
+CONTRIBUTING.md
+SUPPORT.md
+spec-driven.md
+AGENTS.md

@@ -43,3 +43,14 @@ env/
 .genreleases/
 *.zip
 sdd-*/
+
+# Node.js
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+package-lock.json
+
+# OAuth tokens (never commit!)
+.specify/
+oauth_token.json

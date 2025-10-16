@@ -7,6 +7,35 @@ All notable changes to the Specify CLI will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.0] - 2025-10-16
+
+### Added
+
+- **GitHub OAuth authentication**: Browser-based and device flow OAuth for team access control
+- **Organization membership verification**: Automatic verification that users are members of authorized GitHub organization
+- **npm distribution**: Package now available via npm/npx for easier team distribution
+- **Node.js wrapper**: JavaScript wrapper around Python CLI that handles OAuth authentication
+- **Logout command**: New `specify logout` command to clear OAuth authentication
+- **Secure token storage**: OAuth tokens stored securely in `~/.specify/oauth_token.json` with restrictive file permissions (600)
+- **Dual authentication flows**: 
+  - Browser flow (default) - automatic browser-based OAuth for GUI environments
+  - Device flow - manual code entry for SSH/headless environments
+- **Environment detection**: Automatically selects appropriate OAuth flow based on environment
+
+### Changed
+
+- **Authentication method**: OAuth flow instead of manual token creation for better security and UX
+- **Distribution method**: Now available via npm in addition to pip
+- **Version**: Bumped to 0.3.0 per AGENTS.md requirements for changes to `__init__.py`
+
+### Security
+
+- OAuth tokens have minimal permissions (read:org, read:user only)
+- CSRF protection via state parameter in OAuth flow
+- Local callback server for OAuth (localhost only, port 8888)
+- Token files created with restrictive permissions (600)
+- No token data sent to external servers (stays on user's machine)
+
 ## [LATEST_VERSION] - RELEASE_DATE
 
 ### Added
