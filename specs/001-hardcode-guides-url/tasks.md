@@ -1,0 +1,362 @@
+# Tasks: Hardcode Implementation Guides Repository URL
+
+**Input**: Design documents from `/specs/001-hardcode-guides-url/`
+**Prerequisites**: plan.md ✅, spec.md ✅, quickstart.md ✅
+
+**Tests**: Tests are REQUIRED per Constitution Principle II (Test-Driven Implementation). Implementation already exists; tests will be added retroactively.
+
+**Organization**: Tasks are grouped by user story to enable independent implementation and testing of each story.
+
+## Format: `[ID] [P?] [Story?] Description`
+- **[P]**: Can run in parallel (different files, no dependencies)
+- **[Story]**: Which user story this task belongs to (US1, US2, US3)
+- Include exact file paths in descriptions
+
+## Path Conventions
+- **Single project**: `src/specify_cli/`, `tests/` at repository root
+- This is a CLI tool - all paths relative to repository root
+
+---
+
+## Phase 1: Setup (Test Infrastructure)
+
+**Purpose**: Create test directory structure and fixtures for testing guides integration
+
+- [ ] T001 Create test directory structure: `tests/unit/`, `tests/integration/`, `tests/fixtures/`
+- [ ] T002 [P] Create mock guides repository fixture in `tests/fixtures/mock_guides_repo/`
+- [ ] T003 [P] Set up pytest configuration in `pyproject.toml` or `pytest.ini`
+- [ ] T004 [P] Create test helper utilities for git repository operations in `tests/conftest.py`
+
+**Checkpoint**: Test infrastructure ready for writing tests
+
+---
+
+## Phase 2: Foundational (No Blocking Prerequisites)
+
+**Purpose**: N/A - This feature has no foundational blocking tasks. Implementation is a modification to existing code.
+
+**Note**: Since the implementation already exists in `src/specify_cli/__init__.py`, we proceed directly to adding tests and documentation for each user story.
+
+---
+
+## Phase 3: User Story 1 - Developer Initializes New Project with Automatic Guides (Priority: P1) 🎯 MVP
+
+**Goal**: Ensure `specify init` automatically integrates implementation guides without developer configuration, using hardcoded `GUIDES_REPO_URL` constant
+
+**Independent Test**: Run `specify init my-project --ai claude` and verify `context/references/` contains guides submodule from hardcoded URL
+
+**Implementation Status**: ✅ Code exists in `feat/hardcode-guides-url` branch
+
+### Tests for User Story 1 (REQUIRED - TDD Retroactive)
+
+**NOTE**: Implementation exists; write tests to verify existing behavior
+
+#### Unit Tests (tests/unit/test_guides_integration.py)
+
+- [ ] T005 [P] [US1] Test `clone_guides_as_submodule()` with valid URL in `tests/unit/test_guides_integration.py`
+- [ ] T006 [P] [US1] Test `clone_guides_as_submodule()` with invalid URL in `tests/unit/test_guides_integration.py`
+- [ ] T007 [P] [US1] Test `clone_guides_as_submodule()` when directory exists as valid submodule in `tests/unit/test_guides_integration.py`
+- [ ] T008 [P] [US1] Test `clone_guides_as_submodule()` when directory exists but is NOT a submodule in `tests/unit/test_guides_integration.py`
+- [ ] T009 [P] [US1] Test `clone_guides_as_submodule()` timeout handling (30s for add) in `tests/unit/test_guides_integration.py`
+- [ ] T010 [P] [US1] Test `clone_guides_as_submodule()` timeout handling (60s for update) in `tests/unit/test_guides_integration.py`
+- [ ] T011 [P] [US1] Test `clone_guides_as_submodule()` network error handling in `tests/unit/test_guides_integration.py`
+- [ ] T012 [P] [US1] Test `clone_guides_as_submodule()` "already exists" git error is treated as success in `tests/unit/test_guides_integration.py`
+
+#### Integration Tests (tests/integration/test_init_with_guides.py)
+
+- [ ] T013 [P] [US1] Test `specify init` creates guides submodule with hardcoded URL in `tests/integration/test_init_with_guides.py`
+- [ ] T014 [P] [US1] Test `specify init` without environment variables uses hardcoded constant in `tests/integration/test_init_with_guides.py`
+- [ ] T015 [P] [US1] Test `specify init` fails gracefully when guides URL is inaccessible in `tests/integration/test_init_with_guides.py`
+- [ ] T016 [P] [US1] Test `specify init` skips re-cloning if guides already exist in `tests/integration/test_init_with_guides.py`
+- [ ] T017 [P] [US1] Test `specify init` in non-git repository shows clear error for guides step in `tests/integration/test_init_with_guides.py`
+
+#### Edge Case Tests (tests/integration/test_guides_edge_cases.py)
+
+- [ ] T018 [P] [US1] Edge case: `context/references/` exists but not submodule - verify clear error in `tests/integration/test_guides_edge_cases.py`
+- [ ] T019 [P] [US1] Edge case: Network/permission issues - verify actionable error message in `tests/integration/test_guides_edge_cases.py`
+- [ ] T020 [P] [US1] Edge case: Non-git repository - verify guides integration is skipped or fails with explanation in `tests/integration/test_guides_edge_cases.py`
+- [ ] T021 [P] [US1] Edge case: Empty/malformed guides repository - verify initialization completes with warning in `tests/integration/test_guides_edge_cases.py`
+- [ ] T022 [P] [US1] Edge case: Interrupted clone (simulate SIGINT) - verify partial state cleanup in `tests/integration/test_guides_edge_cases.py`
+- [ ] T023 [P] [US1] Edge case: Invalid URL format in hardcoded constant - verify validation and clear error in `tests/integration/test_guides_edge_cases.py`
+
+### Implementation Verification for User Story 1
+
+**NOTE**: Code already exists - verify it matches specification
+
+- [ ] T024 [US1] Verify `GUIDES_REPO_URL` constant exists at line ~85 in `src/specify_cli/__init__.py`
+- [ ] T025 [US1] Verify `GUIDES_REPO_URL` constant has correct documentation comments in `src/specify_cli/__init__.py`
+- [ ] T026 [US1] Verify `clone_guides_as_submodule()` checks for existing directory before cloning in `src/specify_cli/__init__.py`
+- [ ] T027 [US1] Verify `clone_guides_as_submodule()` validates `.gitmodules` for existing submodule in `src/specify_cli/__init__.py`
+- [ ] T028 [US1] Verify `clone_guides_as_submodule()` handles "already exists" error gracefully in `src/specify_cli/__init__.py`
+- [ ] T029 [US1] Verify `init()` command always attempts guides integration at line ~1100 in `src/specify_cli/__init__.py`
+- [ ] T030 [US1] Verify `init()` uses hardcoded constant as fallback in `src/specify_cli/__init__.py`
+- [ ] T031 [US1] Verify `init()` treats guides clone failure as fatal error in `src/specify_cli/__init__.py`
+
+### Documentation for User Story 1
+
+- [ ] T032 [P] [US1] Update README.md with `GUIDES_REPO_URL` constant documentation
+- [ ] T033 [P] [US1] Add automatic guides integration section to `docs/quickstart.md`
+- [ ] T034 [P] [US1] Update `specify init --help` text to mention automatic guides
+
+**Checkpoint**: User Story 1 fully tested and documented - MVP complete!
+
+---
+
+## Phase 4: User Story 2 - Testing/CI Pipeline Overrides Guides URL (Priority: P2)
+
+**Goal**: Enable `SPECIFY_GUIDES_REPO_URL` environment variable to override hardcoded constant for testing/CI scenarios
+
+**Independent Test**: Set `export SPECIFY_GUIDES_REPO_URL="git@github.com:test-org/test-guides.git"` and verify `specify init` uses override URL
+
+**Implementation Status**: ✅ Code exists in `feat/hardcode-guides-url` branch
+
+### Tests for User Story 2 (REQUIRED - TDD Retroactive)
+
+#### Unit Tests (tests/unit/test_guides_integration.py)
+
+- [ ] T035 [P] [US2] Test environment variable override takes precedence over constant in `tests/unit/test_guides_integration.py`
+- [ ] T036 [P] [US2] Test fallback to hardcoded constant when env var is not set in `tests/unit/test_guides_integration.py`
+- [ ] T037 [P] [US2] Test empty string environment variable falls back to constant in `tests/unit/test_guides_integration.py`
+- [ ] T038 [P] [US2] Test whitespace-only environment variable falls back to constant in `tests/unit/test_guides_integration.py`
+
+#### Integration Tests (tests/integration/test_init_with_guides.py)
+
+- [ ] T039 [P] [US2] Test `specify init` with `SPECIFY_GUIDES_REPO_URL` set uses override URL in `tests/integration/test_init_with_guides.py`
+- [ ] T040 [P] [US2] Test `specify init` with invalid override URL shows clear error in `tests/integration/test_init_with_guides.py`
+- [ ] T041 [P] [US2] Test `specify init` with empty override env var falls back to hardcoded URL in `tests/integration/test_init_with_guides.py`
+
+### Implementation Verification for User Story 2
+
+**NOTE**: Code already exists - verify it matches specification
+
+- [ ] T042 [US2] Verify environment variable check logic: `os.getenv("SPECIFY_GUIDES_REPO_URL", "").strip() or GUIDES_REPO_URL` in `src/specify_cli/__init__.py`
+- [ ] T043 [US2] Verify override mechanism is documented in code comments in `src/specify_cli/__init__.py`
+
+### Documentation for User Story 2
+
+- [ ] T044 [P] [US2] Add `SPECIFY_GUIDES_REPO_URL` to Environment Variables table in `README.md`
+- [ ] T045 [P] [US2] Document override usage in `docs/TEAM_INSTALLATION.md`
+- [ ] T046 [P] [US2] Add CI/CD override examples to `quickstart.md` (already exists, verify completeness)
+
+**Checkpoint**: User Story 2 tested and documented - Override mechanism validated!
+
+---
+
+## Phase 5: User Story 3 - Developer Updates Guides in Existing Project (Priority: P3)
+
+**Goal**: Maintain `specify guides update` command to allow developers to update guides to latest version
+
+**Independent Test**: Initialize project, manually edit guides, run `specify guides update`, verify restoration to latest
+
+**Implementation Status**: ✅ Code exists (no changes needed from previous implementation)
+
+### Tests for User Story 3 (REQUIRED - TDD Retroactive)
+
+#### Integration Tests (tests/integration/test_guides_update.py)
+
+- [ ] T047 [P] [US3] Test `specify guides update` updates submodule to latest commit in `tests/integration/test_guides_update.py`
+- [ ] T048 [P] [US3] Test `specify guides update` shows changes and prompts for commit in `tests/integration/test_guides_update.py`
+- [ ] T049 [P] [US3] Test `specify guides update` shows "already up to date" when no changes in `tests/integration/test_guides_update.py`
+- [ ] T050 [P] [US3] Test `specify guides update` fails gracefully when no guides present in `tests/integration/test_guides_update.py`
+- [ ] T051 [P] [US3] Test `specify guides update` fails gracefully when not in git repository in `tests/integration/test_guides_update.py`
+- [ ] T052 [P] [US3] Test `specify guides update` handles directory exists but not submodule error in `tests/integration/test_guides_update.py`
+
+### Implementation Verification for User Story 3
+
+**NOTE**: Code already exists from previous implementation - verify it still works
+
+- [ ] T053 [US3] Verify `guides update` command exists and is accessible via CLI in `src/specify_cli/__init__.py`
+- [ ] T054 [US3] Verify `update_guides()` function uses `git submodule update --remote --merge` in `src/specify_cli/__init__.py`
+- [ ] T055 [US3] Verify error handling for missing guides directory in `src/specify_cli/__init__.py`
+- [ ] T056 [US3] Verify error handling for non-git repository in `src/specify_cli/__init__.py`
+
+### Documentation for User Story 3
+
+- [ ] T057 [P] [US3] Add `specify guides update` to Commands table in `README.md`
+- [ ] T058 [P] [US3] Document update workflow in `docs/TEAM_INSTALLATION.md`
+- [ ] T059 [P] [US3] Update `specify guides --help` text with current functionality
+
+**Checkpoint**: User Story 3 tested and documented - Guides update verified!
+
+---
+
+## Phase 6: Polish & Cross-Cutting Concerns
+
+**Purpose**: Final documentation, version management, and release preparation
+
+### Documentation Updates
+
+- [ ] T060 [P] Update `CHANGELOG.md` with v0.4.0 release notes
+- [ ] T061 [P] Verify `GUIDES_IMPLEMENTATION_COMPLETE.md` is accurate
+- [ ] T062 [P] Update `NEXTSTEPS.md` to mark v0.4.0 as complete
+- [ ] T063 [P] Review and finalize `quickstart.md` completeness
+- [ ] T064 [P] Add implementation notes to `AGENTS.md` if needed
+
+### Version Management
+
+- [ ] T065 Verify version bump to 0.4.0 in `pyproject.toml`
+- [ ] T066 Verify version bump to 0.4.0 in `package.json`
+- [ ] T067 Verify all version references are consistent across files
+
+### Testing & Validation
+
+- [ ] T068 Run all unit tests: `pytest tests/unit/ -v`
+- [ ] T069 Run all integration tests: `pytest tests/integration/ -v`
+- [ ] T070 Run all tests with coverage: `pytest --cov=src/specify_cli tests/`
+- [ ] T071 Verify test coverage meets minimum threshold (>80%)
+- [ ] T072 Run manual smoke test: `specify init /tmp/test-project --ai claude`
+- [ ] T073 Verify guides cloned correctly: `ls /tmp/test-project/context/references/`
+- [ ] T074 Test override mechanism: `SPECIFY_GUIDES_REPO_URL=<test-url> specify init /tmp/test-override`
+
+### Code Quality
+
+- [ ] T075 [P] Run linter: `ruff check src/specify_cli/`
+- [ ] T076 [P] Run formatter: `ruff format src/specify_cli/`
+- [ ] T077 [P] Check for type errors: `mypy src/specify_cli/` (if applicable)
+- [ ] T078 Review all error messages for clarity and actionability
+
+### CI/CD & Release
+
+- [ ] T079 Ensure all CI checks pass on branch
+- [ ] T080 Create pull request from `001-hardcode-guides-url` to `main`
+- [ ] T081 Request code review from team
+- [ ] T082 Merge approved PR to `main`
+- [ ] T083 Tag release: `git tag v0.4.0`
+- [ ] T084 Push tag: `git push origin v0.4.0`
+- [ ] T085 Publish to npm: `npm publish`
+- [ ] T086 Update pip package distribution
+
+### Communication
+
+- [ ] T087 Announce release to team with upgrade instructions
+- [ ] T088 Update internal documentation/wiki if applicable
+
+**Final Checkpoint**: All tests pass, documentation complete, ready for production deployment!
+
+---
+
+## Dependencies & Execution Order
+
+### Phase Dependencies
+
+- **Setup (Phase 1)**: No dependencies - can start immediately
+- **Foundational (Phase 2)**: N/A for this feature
+- **User Stories (Phase 3-5)**: Can proceed independently (implementation exists)
+  - Tests can be written in parallel across all three stories
+  - Verification tasks should follow test completion
+  - Documentation can be updated in parallel
+- **Polish (Phase 6)**: Depends on all user stories being tested and verified
+
+### User Story Dependencies
+
+- **User Story 1 (P1)**: No dependencies - core functionality
+- **User Story 2 (P2)**: Depends on US1 conceptually but tests can run in parallel
+- **User Story 3 (P3)**: Independent of US1 and US2 - can be tested in parallel
+
+### Within Each User Story
+
+- **Tests**: All tests marked [P] can run in parallel
+- **Verification**: Sequential (verify code after tests are written)
+- **Documentation**: All docs marked [P] can run in parallel
+
+### Parallel Opportunities
+
+#### Phase 1: Setup
+All 4 setup tasks (T001-T004) can run in parallel
+
+#### Phase 3: User Story 1 Tests
+All unit tests (T005-T012) can run in parallel
+All integration tests (T013-T017) can run in parallel
+All edge case tests (T018-T023) can run in parallel
+
+#### Phase 4: User Story 2 Tests
+All unit tests (T035-T038) can run in parallel
+All integration tests (T039-T041) can run in parallel
+
+#### Phase 5: User Story 3 Tests
+All integration tests (T047-T052) can run in parallel
+
+#### Phase 6: Polish
+Documentation (T060-T064) can run in parallel
+Testing validation (T068-T074) should run sequentially
+Code quality (T075-T078) can run in parallel
+
+---
+
+## Parallel Example: User Story 1 Unit Tests
+
+```bash
+# Launch all unit tests for User Story 1 together:
+pytest tests/unit/test_guides_integration.py::test_clone_guides_with_valid_url &
+pytest tests/unit/test_guides_integration.py::test_clone_guides_with_invalid_url &
+pytest tests/unit/test_guides_integration.py::test_clone_guides_directory_exists_as_submodule &
+pytest tests/unit/test_guides_integration.py::test_clone_guides_directory_exists_not_submodule &
+pytest tests/unit/test_guides_integration.py::test_clone_guides_timeout_add &
+pytest tests/unit/test_guides_integration.py::test_clone_guides_timeout_update &
+pytest tests/unit/test_guides_integration.py::test_clone_guides_network_error &
+pytest tests/unit/test_guides_integration.py::test_clone_guides_already_exists_handled &
+wait
+```
+
+---
+
+## Implementation Strategy
+
+### Retroactive TDD Approach (Implementation Exists)
+
+1. **Phase 1**: Setup test infrastructure (T001-T004)
+2. **Phase 3**: Write all User Story 1 tests (T005-T034)
+   - Tests should pass immediately (implementation exists)
+   - If tests fail, fix implementation to match specification
+3. **Phase 4**: Write all User Story 2 tests (T035-T046)
+4. **Phase 5**: Write all User Story 3 tests (T047-T059)
+5. **Phase 6**: Polish and release (T060-T088)
+
+### MVP Validation (User Story 1 Only)
+
+1. Complete Phase 1: Setup
+2. Complete Phase 3: User Story 1 tests and verification
+3. **STOP and VALIDATE**: All US1 tests pass
+4. Document US1 and prepare for demo
+5. Optionally deploy/demo just US1 functionality
+
+### Incremental Delivery
+
+1. US1 tested → MVP ready → Demo/Deploy
+2. US2 tested → Override capability validated → Demo/Deploy
+3. US3 tested → Update command verified → Demo/Deploy
+4. Polish → Production release v0.4.0
+
+### Parallel Team Strategy
+
+With multiple developers:
+
+1. **Developer A**: Write US1 tests (T005-T034)
+2. **Developer B**: Write US2 tests (T035-T046)
+3. **Developer C**: Write US3 tests (T047-T059)
+4. **All together**: Polish phase (T060-T088)
+
+---
+
+## Task Summary
+
+**Total Tasks**: 88
+- Phase 1 (Setup): 4 tasks
+- Phase 2 (Foundational): 0 tasks (N/A)
+- Phase 3 (US1): 30 tasks (19 tests + 8 verification + 3 docs)
+- Phase 4 (US2): 12 tasks (7 tests + 2 verification + 3 docs)
+- Phase 5 (US3): 13 tasks (6 tests + 4 verification + 3 docs)
+- Phase 6 (Polish): 29 tasks
+
+**Parallel Opportunities**: 58 tasks marked [P] (66%)
+
+**Test Tasks**: 32 tests (36%)
+- Unit tests: 12
+- Integration tests: 14
+- Edge case tests: 6
+
+**Implementation Note**: Code already exists in `feat/hardcode-guides-url` branch. This task list focuses on adding comprehensive tests retroactively per Constitution Principle II (Test-Driven Implementation), verifying implementation matches specification, and completing documentation for v0.4.0 release.
+
+**MVP Scope**: Phase 1 + Phase 3 (User Story 1) = 34 tasks
+
+**Recommended Execution**: Phases 3-5 (all tests) can run in parallel, then converge on Phase 6 (polish) for final release.
