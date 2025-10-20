@@ -122,6 +122,28 @@ Finally, implement the solution:
 implement specs/002-create-taskify/plan.md
 ```
 
+## Advanced Configuration
+
+### Custom Implementation Guides (CI/CD & Testing)
+
+For CI/CD pipelines and testing environments, you can override the implementation guides repository:
+
+```bash
+# In your CI/CD pipeline or testing environment
+export SPECIFY_GUIDES_REPO_URL="git@github.com:your-org/test-guides.git"
+specify init my-test-project --ai claude
+
+# Or use a staging guides repository for development
+export SPECIFY_GUIDES_REPO_URL="https://github.com/your-org/staging-guides.git"  
+specify init my-dev-project --ai copilot
+```
+
+**Common Override Scenarios:**
+- **Testing**: Use test-specific implementation patterns and examples
+- **Staging**: Point to development/staging guides during feature development  
+- **Organization-specific**: Use company-specific guides for internal projects
+- **Environment separation**: Different guides for prod/dev/test environments
+
 ## Key Principles
 
 - **Be explicit** about what you're building and why

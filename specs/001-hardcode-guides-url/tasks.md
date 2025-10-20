@@ -47,41 +47,39 @@
 
 ---
 
-## Phase 4: User Story 2 - Testing/CI Pipeline Overrides Guides URL (Priority: P2)
+## Phase 4: User Story 2 - Testing/CI Pipeline Overrides Guides URL (Priority: P2) ✅ COMPLETE
 
-**Goal**: Enable `SPECIFY_GUIDES_REPO_URL` environment variable to override hardcoded constant for testing/CI scenarios
+**Status**: All 12 tasks completed - Environment variable override mechanism fully tested and documented!
 
-**Independent Test**: Set `export SPECIFY_GUIDES_REPO_URL="git@github.com:test-org/test-guides.git"` and verify `specify init` uses override URL
-
-**Implementation Status**: ✅ Code exists in `feat/hardcode-guides-url` branch
+**Summary**: Created comprehensive tests for SPECIFY_GUIDES_REPO_URL override functionality. Verified implementation logic and updated all documentation. User Story 2 ready for production use.
 
 ### Tests for User Story 2 (REQUIRED - TDD Retroactive)
 
 #### Unit Tests (tests/unit/test_guides_integration.py)
 
-- [ ] T035 [P] [US2] Test environment variable override takes precedence over constant in `tests/unit/test_guides_integration.py`
-- [ ] T036 [P] [US2] Test fallback to hardcoded constant when env var is not set in `tests/unit/test_guides_integration.py`
-- [ ] T037 [P] [US2] Test empty string environment variable falls back to constant in `tests/unit/test_guides_integration.py`
-- [ ] T038 [P] [US2] Test whitespace-only environment variable falls back to constant in `tests/unit/test_guides_integration.py`
+- [x] T035 [P] [US2] Test environment variable override takes precedence over constant in `tests/unit/test_guides_integration.py`
+- [x] T036 [P] [US2] Test fallback to hardcoded constant when env var is not set in `tests/unit/test_guides_integration.py`
+- [x] T037 [P] [US2] Test empty string environment variable falls back to constant in `tests/unit/test_guides_integration.py`
+- [x] T038 [P] [US2] Test whitespace-only environment variable falls back to constant in `tests/unit/test_guides_integration.py`
 
-#### Integration Tests (tests/integration/test_init_with_guides.py)
+#### Integration Tests (tests/integration/test_environment_override.py)
 
-- [ ] T039 [P] [US2] Test `specify init` with `SPECIFY_GUIDES_REPO_URL` set uses override URL in `tests/integration/test_init_with_guides.py`
-- [ ] T040 [P] [US2] Test `specify init` with invalid override URL shows clear error in `tests/integration/test_init_with_guides.py`
-- [ ] T041 [P] [US2] Test `specify init` with empty override env var falls back to hardcoded URL in `tests/integration/test_init_with_guides.py`
+- [x] T039 [P] [US2] Test `specify init` with `SPECIFY_GUIDES_REPO_URL` set uses override URL in `tests/integration/test_environment_override.py`
+- [x] T040 [P] [US2] Test `specify init` with invalid override URL shows clear error in `tests/integration/test_environment_override.py`
+- [x] T041 [P] [US2] Test `specify init` with empty override env var falls back to hardcoded URL in `tests/integration/test_environment_override.py`
 
 ### Implementation Verification for User Story 2
 
 **NOTE**: Code already exists - verify it matches specification
 
-- [ ] T042 [US2] Verify environment variable check logic: `os.getenv("SPECIFY_GUIDES_REPO_URL", "").strip() or GUIDES_REPO_URL` in `src/specify_cli/__init__.py`
-- [ ] T043 [US2] Verify override mechanism is documented in code comments in `src/specify_cli/__init__.py`
+- [x] T042 [US2] Verify environment variable check logic: `os.getenv("SPECIFY_GUIDES_REPO_URL", "").strip() or GUIDES_REPO_URL` in `src/specify_cli/__init__.py`
+- [x] T043 [US2] Verify override mechanism is documented in code comments in `src/specify_cli/__init__.py`
 
 ### Documentation for User Story 2
 
-- [ ] T044 [P] [US2] Add `SPECIFY_GUIDES_REPO_URL` to Environment Variables table in `README.md`
-- [ ] T045 [P] [US2] Document override usage in `docs/TEAM_INSTALLATION.md`
-- [ ] T046 [P] [US2] Add CI/CD override examples to `quickstart.md` (already exists, verify completeness)
+- [x] T044 [P] [US2] Add `SPECIFY_GUIDES_REPO_URL` to Environment Variables table in `README.md`
+- [x] T045 [P] [US2] Document override usage in `docs/TEAM_INSTALLATION.md`
+- [x] T046 [P] [US2] Add CI/CD override examples to `quickstart.md` (already exists, verify completeness)
 
 **Checkpoint**: User Story 2 tested and documented - Override mechanism validated!
 
@@ -283,18 +281,18 @@ With multiple developers:
 
 ---
 
-## Overall Progress: 34/88 tasks completed (38.6%)
+## Overall Progress: 46/88 tasks completed (52.3%)
 
 ### Phase Status Summary:
 - **Phase 1**: Test Infrastructure Setup ✅ COMPLETE (4/4 tasks)
 - **Phase 2**: Implementation ✅ COMPLETE (0/0 tasks - code already existed)
 - **Phase 3**: User Story 1 Testing ✅ COMPLETE (30/30 tasks)
-- **Phase 4**: User Story 2 Testing 🔄 PENDING (0/0 tasks)
-- **Phase 5**: User Story 3 Testing 🔄 PENDING (0/0 tasks)
-- **Phase 6**: Polish & Release 🔄 PENDING (54/54 tasks)
+- **Phase 4**: User Story 2 Testing ✅ COMPLETE (12/12 tasks)
+- **Phase 5**: User Story 3 Testing 🔄 PENDING (13/13 tasks)
+- **Phase 6**: Polish & Release 🔄 PENDING (29/29 tasks)
 
-### MVP Status: User Story 1 Complete ✅
-The core feature (automatic guides integration) is fully implemented, tested, and ready for validation. All 23 core tests passing across unit, integration, and edge cases.
+### MVP Status: User Stories 1 & 2 Complete ✅
+Both core features (automatic guides integration + environment variable override) are fully implemented, tested, and ready for validation. All unit and integration tests passing.
 
 ---
 

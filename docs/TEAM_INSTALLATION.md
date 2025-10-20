@@ -360,6 +360,10 @@ specify logout          # Clear authentication
 specify init my-project --ai claude
 specify init . --here --force
 
+# Custom Implementation Guides (optional)
+export SPECIFY_GUIDES_REPO_URL="git@github.com:your-org/custom-guides.git"
+specify init my-project --ai claude  # Uses custom guides
+
 # Tools Check
 specify check
 
@@ -367,6 +371,33 @@ specify check
 specify --help
 specify --version
 ```
+
+## Environment Variables
+
+### Implementation Guides Override
+
+You can override the default implementation guides repository by setting the `SPECIFY_GUIDES_REPO_URL` environment variable:
+
+```bash
+# Set custom guides repository (before running specify init)
+export SPECIFY_GUIDES_REPO_URL="git@github.com:your-org/implementation-guides.git"
+
+# Initialize project with custom guides
+specify init my-project --ai claude
+
+# The guides will be cloned into context/references/ from your custom repository
+```
+
+**Use Cases for Custom Guides:**
+- **Testing environments**: Use a test/staging guides repository
+- **Organization-specific guides**: Use company-specific implementation patterns  
+- **Development workflows**: Use different guides for different project types
+- **CI/CD pipelines**: Override guides repository per environment
+
+**Fallback Behavior:**
+- If `SPECIFY_GUIDES_REPO_URL` is set and valid → Uses override repository
+- If `SPECIFY_GUIDES_REPO_URL` is not set or empty → Uses default guides repository
+- If guides repository is inaccessible → Initialization fails with clear error message
 
 ## Next Steps
 

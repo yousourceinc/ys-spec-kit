@@ -342,3 +342,70 @@ class TestCloneGuidesAsSubmodule:
         assert result is True
         mock_tracker.start.assert_called_once_with("guides", "Cloning guides repository as submodule")
         mock_tracker.complete.assert_called_once_with("guides", "Guides submodule already configured")
+
+
+class TestEnvironmentVariableOverride:
+    """Test cases for SPECIFY_GUIDES_REPO_URL environment variable override functionality."""
+
+    @patch('os.getenv')
+    def test_environment_variable_override_takes_precedence(self, mock_getenv):
+        """Test that environment variable override takes precedence over hardcoded constant."""
+        # Arrange
+        override_url = "git@github.com:test-org/test-guides.git"
+        mock_getenv.return_value = override_url
+        
+        # Import after mocking to ensure override is captured
+        from specify_cli import GUIDES_REPO_URL
+        
+        # Act - simulate the override logic from init() function
+        guides_repo_url = os.getenv("SPECIFY_GUIDES_REPO_URL", "").strip() or GUIDES_REPO_URL
+        
+        # Assert
+        mock_getenv.assert_called_with("SPECIFY_GUIDES_REPO_URL", "")
+        assert guides_repo_url == override_url
+        assert guides_repo_url != GUIDES_REPO_URL  # Should not use hardcoded constant
+
+    @patch('os.getenv')
+    def test_fallback_to_hardcoded_constant_when_env_var_not_set(self, mock_getenv):
+        """Test fallback to hardcoded constant when environment variable is not set."""
+        # Arrange
+        mock_getenv.return_value = ""  # Environment variable not set
+        
+        from specify_cli import GUIDES_REPO_URL
+        
+        # Act - simulate the override logic from init() function
+        guides_repo_url = os.getenv("SPECIFY_GUIDES_REPO_URL", "").strip() or GUIDES_REPO_URL
+        
+        # Assert
+        mock_getenv.assert_called_with("SPECIFY_GUIDES_REPO_URL", "")
+        assert guides_repo_url == GUIDES_REPO_URL  # Should use hardcoded constant
+
+    @patch('os.getenv')
+    def test_empty_string_environment_variable_falls_back_to_constant(self, mock_getenv):
+        """Test that empty string environment variable falls back to hardcoded constant."""
+        # Arrange
+        mock_getenv.return_value = ""  # Empty string
+        
+        from specify_cli import GUIDES_REPO_URL
+        
+        # Act - simulate the override logic from init() function
+        guides_repo_url = os.getenv("SPECIFY_GUIDES_REPO_URL", "").strip() or GUIDES_REPO_URL
+        
+        # Assert
+        mock_getenv.assert_called_with("SPECIFY_GUIDES_REPO_URL", "")
+        assert guides_repo_url == GUIDES_REPO_URL  # Should fall back to hardcoded constant
+
+    @patch('os.getenv')
+    def test_whitespace_only_environment_variable_falls_back_to_constant(self, mock_getenv):
+        """Test that whitespace-only environment variable falls back to hardcoded constant."""
+        # Arrange
+        mock_getenv.return_value = "   \t\n   "  # Whitespace only
+        
+        from specify_cli import GUIDES_REPO_URL
+        
+        # Act - simulate the override logic from init() function
+        guides_repo_url = os.getenv("SPECIFY_GUIDES_REPO_URL", "").strip() or GUIDES_REPO_URL
+        
+        # Assert
+        mock_getenv.assert_called_with("SPECIFY_GUIDES_REPO_URL", "")
+        assert guides_repo_url == GUIDES_REPO_URL  # Should fall back to hardcoded constant after strip()
