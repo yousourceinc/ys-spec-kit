@@ -82,6 +82,12 @@ AI_CHOICES = {
 # Add script type choices
 SCRIPT_TYPE_CHOICES = {"sh": "POSIX Shell (bash/zsh)", "ps": "PowerShell"}
 
+# Official implementation guides repository URL
+# This is the canonical source for implementation guides that will be automatically
+# integrated into every project initialized with specify init.
+# Override: Set SPECIFY_GUIDES_REPO_URL environment variable to use a different repository.
+GUIDES_REPO_URL = "git@github.com:yousourceinc/implementation-guides.git"
+
 # Claude CLI local installation path after migrate-installer
 CLAUDE_LOCAL_PATH = Path.home() / ".claude" / "local" / "claude"
 
@@ -432,6 +438,104 @@ def init_git_repo(project_path: Path, quiet: bool = False) -> bool:
         return False
     finally:
         os.chdir(original_cwd)
+
+
+def clone_guides_as_submodule(project_path: Path, guides_repo_url: str, tracker: StepTracker | None = None) -> bool:
+    """Clone implementation guides as a git submodule in context/references/.
+    
+    Returns True if successful, False otherwise.
+    Requires an existing git repository in project_path.
+    """
+    try:
+        guides_dir = project_path / "context" / "references"
+        
+        if tracker:
+            tracker.start("guides", "Cloning guides repository as submodule")
+        
+        # Check if guides directory already exists
+        if guides_dir.exists():
+            # Check if it's already a valid submodule
+            gitmodules_path = project_path / ".gitmodules"
+            if gitmodules_path.exists():
+                gitmodules_content = gitmodules_path.read_text()
+                if str(guides_dir.relative_to(project_path)) in gitmodules_content:
+                    if tracker:
+                        tracker.complete("guides", "Guides submodule already exists")
+                    else:
+                        console.print("[yellow]Note:[/yellow] Implementation guides submodule already exists")
+                    return True
+            
+            # Directory exists but not a submodule - error
+            if tracker:
+                tracker.error("guides", f"Directory {guides_dir} already exists but is not a submodule")
+            else:
+                console.print(f"[red]Error:[/red] Directory {guides_dir} already exists but is not a submodule")
+            return False
+        
+        # Create context directory if it doesn't exist
+        guides_dir.parent.mkdir(parents=True, exist_ok=True)
+        
+        # Add git submodule
+        result = subprocess.run(
+            ["git", "submodule", "add", guides_repo_url, str(guides_dir)],
+            cwd=project_path,
+            capture_output=True,
+            text=True,
+            timeout=30
+        )
+        
+        if result.returncode != 0:
+            error_msg = result.stderr or result.stdout
+            # Check if it's the "already exists" error
+            if "already exists" in error_msg.lower():
+                if tracker:
+                    tracker.complete("guides", "Guides submodule already configured")
+                else:
+                    console.print("[yellow]Note:[/yellow] Guides submodule already configured")
+                return True
+            
+            if tracker:
+                tracker.error("guides", f"Failed to add submodule: {error_msg}")
+            else:
+                console.print(f"[red]Error adding guides submodule:[/red] {error_msg}")
+            return False
+        
+        # Initialize and update the submodule
+        result = subprocess.run(
+            ["git", "submodule", "update", "--init", "--recursive"],
+            cwd=project_path,
+            capture_output=True,
+            text=True,
+            timeout=60
+        )
+        
+        if result.returncode != 0:
+            error_msg = result.stderr or result.stdout
+            if tracker:
+                tracker.error("guides", f"Failed to initialize submodule: {error_msg}")
+            else:
+                console.print(f"[red]Error initializing guides submodule:[/red] {error_msg}")
+            return False
+        
+        if tracker:
+            tracker.complete("guides", "Guides submodule initialized")
+        else:
+            console.print("[green]✓[/green] Implementation guides cloned successfully")
+        
+        return True
+        
+    except subprocess.TimeoutExpired:
+        if tracker:
+            tracker.error("guides", "Clone operation timed out")
+        else:
+            console.print("[red]Error:[/red] Guides repository clone timed out")
+        return False
+    except Exception as e:
+        if tracker:
+            tracker.error("guides", str(e))
+        else:
+            console.print(f"[red]Error cloning guides:[/red] {e}")
+        return False
 
 
 def download_template_from_github(ai_assistant: str, download_dir: Path, *, script_type: str = "sh", verbose: bool = True, show_progress: bool = True, client: httpx.Client = None, debug: bool = False, github_token: str = None) -> Tuple[Path, dict]:
@@ -967,6 +1071,7 @@ def init(
         ("chmod", "Ensure scripts executable"),
         ("cleanup", "Cleanup"),
         ("git", "Initialize git repository"),
+        ("guides", "Clone implementation guides"),
         ("final", "Finalize")
     ]:
         tracker.add(key, label)
@@ -999,6 +1104,18 @@ def init(
                     tracker.skip("git", "git not available")
             else:
                 tracker.skip("git", "--no-git flag")
+            
+            # Guides step - always attempt to integrate guides
+            # Use environment variable override if set, otherwise use hardcoded URL
+            guides_repo_url = os.getenv("SPECIFY_GUIDES_REPO_URL", "").strip() or GUIDES_REPO_URL
+            
+            if not is_git_repo(project_path):
+                tracker.error("guides", "requires git repository")
+            else:
+                # Always attempt to clone guides (required for all projects)
+                if not clone_guides_as_submodule(project_path, guides_repo_url, tracker=tracker):
+                    # Clone failed - this is a fatal error since guides are required
+                    raise Exception(f"Failed to clone implementation guides from {guides_repo_url}")
 
             tracker.complete("final", "project ready")
         except Exception as e:
@@ -1197,6 +1314,131 @@ def check():
         console.print("[dim]Tip: Install git for repository management[/dim]")
     if not (claude_ok or gemini_ok or cursor_ok or qwen_ok or windsurf_ok or kilocode_ok or opencode_ok or codex_ok or auggie_ok or q_ok):
         console.print("[dim]Tip: Install an AI assistant for the best experience[/dim]")
+
+
+@app.command()
+def guides(
+    action: str = typer.Argument(
+        ...,
+        help="Action to perform: update"
+    )
+):
+    """
+    Manage implementation guides in your project.
+    
+    Guides are implementation patterns and best practices bundled with your project.
+    They are automatically available in context/references/ and referenced by AI agents
+    during /specify, /plan, and /tasks commands.
+    
+    Currently supported command:
+        specify guides update    Update guides to the latest version
+    
+    Future commands (planned):
+        specify guides search    Search guides by keyword
+        specify guides show      Display a specific guide
+    
+    Note: Guide repository configuration is set at the binary level via the
+    SPECIFY_GUIDES_REPO_URL environment variable during project initialization.
+    
+    Examples:
+        specify guides update
+    """
+    
+    if action == "update":
+        update_guides()
+    else:
+        console.print(f"[red]Error:[/red] Unknown action: {action}")
+        console.print("Available actions: update")
+        console.print("\nPlanned actions (not yet implemented): search, show")
+        raise typer.Exit(1)
+
+
+def update_guides():
+    """Update guides to the latest version using git submodule update."""
+    show_banner()
+    
+    project_path = Path.cwd()
+    guides_path = project_path / "context" / "references"
+    
+    console.print("[bold]Updating implementation guides...[/bold]\n")
+    
+    # Check if guides directory exists
+    if not guides_path.exists():
+        console.print(
+            "[yellow]⚠[/yellow]  No implementation guides found in this project."
+        )
+        console.print(f"[dim]Expected location: {guides_path}[/dim]")
+        console.print("\n[dim]Guides are configured via SPECIFY_GUIDES_REPO_URL environment variable")
+        console.print("during project initialization with 'specify init'.[/dim]")
+        raise typer.Exit(0)
+    
+    # Check if this is a git repository
+    if not is_git_repo(project_path):
+        console.print(
+            "[red]Error:[/red] Current directory is not a git repository."
+        )
+        console.print("[dim]Guides management requires git.[/dim]")
+        raise typer.Exit(1)
+    
+    # Check if git is available
+    if not check_tool("git", "https://git-scm.com/downloads"):
+        console.print("[red]Error:[/red] git is not installed or not in PATH")
+        raise typer.Exit(1)
+    
+    try:
+        # Update submodule to latest version
+        console.print("[cyan]Fetching latest changes from guides repository...[/cyan]")
+        
+        result = subprocess.run(
+            ["git", "submodule", "update", "--remote", "--merge"],
+            cwd=project_path,
+            capture_output=True,
+            text=True,
+            timeout=60
+        )
+        
+        if result.returncode == 0:
+            console.print("[green]✓[/green] Implementation guides updated to latest version")
+            
+            # Show what changed (if anything)
+            status_result = subprocess.run(
+                ["git", "status", "--short", str(guides_path)],
+                cwd=project_path,
+                capture_output=True,
+                text=True
+            )
+            
+            if status_result.stdout.strip():
+                console.print("\n[cyan]Changes detected:[/cyan]")
+                console.print(status_result.stdout)
+                console.print("\n[dim]To commit these changes:[/dim]")
+                console.print(f"  [cyan]git add {guides_path.relative_to(project_path)}[/cyan]")
+                console.print(f"  [cyan]git commit -m 'Update implementation guides'[/cyan]")
+            else:
+                console.print("[dim]Guides are already up to date[/dim]")
+        else:
+            error_msg = result.stderr or result.stdout
+            
+            # Check if it's not a submodule error
+            if "not a git repository" in error_msg.lower() or "no submodule mapping" in error_msg.lower():
+                console.print(
+                    "[yellow]⚠[/yellow]  Guides directory exists but is not configured as a git submodule."
+                )
+                console.print(f"[dim]Directory: {guides_path}[/dim]")
+                console.print("\n[dim]This might happen if guides were added manually.")
+                console.print("Consider re-initializing with SPECIFY_GUIDES_REPO_URL set.[/dim]")
+            else:
+                console.print(f"[red]Error updating guides:[/red] {error_msg}")
+            
+            raise typer.Exit(1)
+    
+    except subprocess.TimeoutExpired:
+        console.print("[red]Error:[/red] Update operation timed out")
+        console.print("[dim]The guides repository might be too large or network is slow.[/dim]")
+        raise typer.Exit(1)
+    except Exception as e:
+        console.print(f"[red]Error updating guides:[/red] {e}")
+        raise typer.Exit(1)
 
 
 def main():

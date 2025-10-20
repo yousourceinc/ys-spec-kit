@@ -184,6 +184,7 @@ The `specify` command supports the following options:
 | `init`      | Initialize a new Specify project from the latest template      |
 | `check`     | Check for installed tools (`git`, `claude`, `gemini`, `code`/`code-insiders`, `cursor-agent`, `windsurf`, `qwen`, `opencode`, `codex`) |
 | `logout`    | Clear GitHub OAuth authentication and remove stored token      |
+| `guides`    | Manage implementation guides (`update` implemented; `search` and `show` planned) |
 
 ### `specify init` Arguments & Options
 
@@ -255,11 +256,42 @@ After running `specify init`, your AI coding agent will have access to these sla
 | `/analyze`      | Cross-artifact consistency & coverage analysis (run after /tasks, before /implement) |
 | `/implement`    | Execute all tasks to build the feature according to the plan         |
 
+### Guides Management (CLI)
+
+Manage implementation guides for your project:
+
+```bash
+# Update guides to the latest version
+specify guides update
+```
+
+**Planned commands** (not yet implemented):
+```bash
+# Search for guides by keyword (coming soon)
+specify guides search <keyword>
+
+# Display a specific guide (coming soon)
+specify guides show <guide-path>
+```
+
+**Setup**: Guide repository is configured at the system level via the `SPECIFY_GUIDES_REPO_URL` environment variable before running `specify init`. Set this variable to automatically integrate implementation guides:
+
+```bash
+# Example: Set guides repository URL
+export SPECIFY_GUIDES_REPO_URL="git@github.com:your-org/implementation-guides.git"
+
+# Initialize project (guides will be cloned automatically)
+specify init my-project --ai claude
+```
+
+**Note**: Guide repository configuration (add/remove) is handled at the binary/system level and cannot be modified by developers at runtime. Developers can only update existing guides to the latest version.
+
 ### Environment Variables
 
 | Variable         | Description                                                                                    |
 |------------------|------------------------------------------------------------------------------------------------|
 | `SPECIFY_FEATURE` | Override feature detection for non-Git repositories. Set to the feature directory name (e.g., `001-photo-albums`) to work on a specific feature when not using Git branches.<br/>**Must be set in the context of the agent you're working with prior to using `/plan` or follow-up commands. |
+| `SPECIFY_GUIDES_REPO_URL` | **System-level configuration** for automatic implementation guides integration. Set to a Git repository URL (e.g., `git@github.com:your-org/implementation-guides.git`) before running `specify init`. When set, guides will be automatically cloned as a git submodule into `context/references/`. If not set, no guides will be integrated. |
 
 ## 📚 Core philosophy
 

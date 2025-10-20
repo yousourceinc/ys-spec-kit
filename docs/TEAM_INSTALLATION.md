@@ -131,13 +131,11 @@ Done! Your project is ready.
 # Basic usage
 specify init my-project --ai claude
 
-# With implementation guides
-specify init my-project --ai claude \
-  --guides-repo git@github.com:your-org/implementation-guides.git
-
 # In current directory
 specify init . --ai claude
 ```
+
+**Note**: Implementation guides (if configured) are automatically available after initialization. Use `specify guides` commands to manage them.
 
 ### Logout
 
@@ -154,6 +152,23 @@ Verify installed tools:
 ```bash
 specify check
 ```
+
+### Manage Guides
+
+If implementation guides are configured for your project:
+
+```bash
+# Update guides to the latest version
+specify guides update
+
+# Search guides by keyword
+specify guides search <keyword>
+
+# Display a specific guide  
+specify guides show <guide-path>
+```
+
+**Note**: Guide repository configuration is set at the binary level during project initialization. To add or change guides, contact your team administrator.
 
 ### Get Help
 
@@ -188,8 +203,7 @@ Complete workflow from start to deployment:
 npm install -g @your-org/specify-cli
 
 # 2. Initialize project
-specify init photo-organizer --ai claude \
-  --guides-repo git@github.com:your-org/implementation-guides.git
+specify init photo-organizer --ai claude
 
 # 3. Open in your AI agent (Claude, Copilot, etc.)
 cd photo-organizer
@@ -202,10 +216,9 @@ code .  # or cursor, etc.
 /plan Following our implementation guides
 /tasks
 /implement
-/check-compliance
 
-# 5. Check compliance
-specify compliance report
+# 5. Keep guides updated (if configured)
+specify guides update
 
 # 6. Commit and deploy
 git add .

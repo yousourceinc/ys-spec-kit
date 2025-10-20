@@ -40,6 +40,21 @@ Use the `/plan` command to provide your tech stack and architecture choices.
 
 Use `/tasks` to create an actionable task list, then ask your agent to implement the feature.
 
+## Using Implementation Guides
+
+If implementation guides are configured for your project, reference them during planning:
+
+```bash
+# Search for relevant guides
+specify guides search authentication
+
+# View a specific guide
+specify guides show security/jwt-implementation
+
+# Keep guides up to date
+specify guides update
+```
+
 ## Detailed Example: Building Taskify
 
 Here's a complete example of building a team productivity platform:
