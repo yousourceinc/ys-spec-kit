@@ -111,7 +111,7 @@ def mock_guides_repo(temp_dir: Path) -> Generator[Path, None, None]:
         capture_output=True,
     )
     subprocess.run(
-        ["git", "push", "-u", "origin", "master"],
+        ["git", "push"],
         cwd=clone_dir,
         check=True,
         capture_output=True,

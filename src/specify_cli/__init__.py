@@ -477,7 +477,7 @@ def clone_guides_as_submodule(project_path: Path, guides_repo_url: str, tracker:
         
         # Add git submodule
         result = subprocess.run(
-            ["git", "submodule", "add", guides_repo_url, str(guides_dir)],
+            ["git", "submodule", "add", guides_repo_url, str(guides_dir.relative_to(project_path))],
             cwd=project_path,
             capture_output=True,
             text=True,
