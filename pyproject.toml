@@ -21,3 +21,18 @@ build-backend = "hatchling.build"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/specify_cli"]
+
+[tool.pytest.ini_options]
+minversion = "7.0"
+addopts = "-v --strict-markers --strict-config --tb=short"
+testpaths = ["tests"]
+python_files = ["test_*.py", "*_test.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+markers = [
+    "unit: Unit tests for individual functions",
+    "integration: Integration tests for CLI commands",
+    "edge_case: Edge case and error condition tests",
+    "slow: Slow tests that may take time",
+    "requires_git: Tests that require git to be installed",
+]
