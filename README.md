@@ -184,7 +184,7 @@ The `specify` command supports the following options:
 | `init`      | Initialize a new Specify project from the latest template      |
 | `check`     | Check for installed tools (`git`, `claude`, `gemini`, `code`/`code-insiders`, `cursor-agent`, `windsurf`, `qwen`, `opencode`, `codex`) |
 | `logout`    | Clear GitHub OAuth authentication and remove stored token      |
-| `guides`    | Manage implementation guides (`update` implemented; `search` and `show` planned) |
+| `guides update` | Update implementation guides to the latest version using git submodule |
 
 ### `specify init` Arguments & Options
 

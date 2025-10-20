@@ -1331,7 +1331,11 @@ def guides(
     during /specify, /plan, and /tasks commands.
     
     Currently supported command:
-        specify guides update    Update guides to the latest version
+        specify guides update    Update guides to the latest version using git submodule
+    
+    The update command runs 'git submodule update --remote --merge' to fetch the latest
+    changes from the guides repository. After updating, you'll see a list of changed files
+    (if any) and instructions on how to commit them to your project.
     
     Future commands (planned):
         specify guides search    Search guides by keyword
@@ -1369,7 +1373,7 @@ def update_guides():
         )
         console.print(f"[dim]Expected location: {guides_path}[/dim]")
         console.print("\n[dim]Guides are configured via SPECIFY_GUIDES_REPO_URL environment variable")
-        console.print("during project initialization with 'specify init'.[/dim]")
+        console.print("[dim]during project initialization with 'specify init'.[/dim]")
         raise typer.Exit(0)
     
     # Check if this is a git repository
@@ -1426,7 +1430,7 @@ def update_guides():
                 )
                 console.print(f"[dim]Directory: {guides_path}[/dim]")
                 console.print("\n[dim]This might happen if guides were added manually.")
-                console.print("Consider re-initializing with SPECIFY_GUIDES_REPO_URL set.[/dim]")
+                console.print("[dim]Consider re-initializing with SPECIFY_GUIDES_REPO_URL set.[/dim]")
             else:
                 console.print(f"[red]Error updating guides:[/red] {error_msg}")
             

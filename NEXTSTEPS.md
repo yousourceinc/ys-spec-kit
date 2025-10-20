@@ -10,7 +10,7 @@ This document outlines the planned features and improvements for Specify CLI bas
 
 ### Feature: `specify guides` Commands
 
-**Status**: ✅ PARTIALLY IMPLEMENTED (v0.4.0)
+**Status**: ✅ FULLY IMPLEMENTED (v0.4.0)
 
 Three developer-centric commands for managing implementation guides:
 
@@ -56,7 +56,13 @@ specify guides show        # ⏳ PLANNED - Display a specific guide
    - ✅ `docs/quickstart.md` - Added guides usage example
    - ✅ `docs/TEAM_INSTALLATION.md` - Added guides management section
 
-**⏳ Remaining Work**:
+6. **Comprehensive Testing**:
+   - ✅ Unit tests for guides integration (12 tests)
+   - ✅ Integration tests for guides update (6 tests)
+   - ✅ Edge case tests for error conditions (6 tests)
+   - ✅ Environment variable override tests (3 tests)
+
+**⏳ Future Enhancements (v0.4.1+)**:
 
 1. **Search Command** (planned for v0.4.1):
    - Implement file search/indexing for search functionality

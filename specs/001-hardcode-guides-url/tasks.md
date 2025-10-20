@@ -97,27 +97,27 @@
 
 #### Integration Tests (tests/integration/test_guides_update.py)
 
-- [ ] T047 [P] [US3] Test `specify guides update` updates submodule to latest commit in `tests/integration/test_guides_update.py`
-- [ ] T048 [P] [US3] Test `specify guides update` shows changes and prompts for commit in `tests/integration/test_guides_update.py`
-- [ ] T049 [P] [US3] Test `specify guides update` shows "already up to date" when no changes in `tests/integration/test_guides_update.py`
-- [ ] T050 [P] [US3] Test `specify guides update` fails gracefully when no guides present in `tests/integration/test_guides_update.py`
-- [ ] T051 [P] [US3] Test `specify guides update` fails gracefully when not in git repository in `tests/integration/test_guides_update.py`
-- [ ] T052 [P] [US3] Test `specify guides update` handles directory exists but not submodule error in `tests/integration/test_guides_update.py`
+- [x] T047 [P] [US3] Test `specify guides update` updates submodule to latest commit in `tests/integration/test_guides_update.py`
+- [x] T048 [P] [US3] Test `specify guides update` shows changes and prompts for commit in `tests/integration/test_guides_update.py`
+- [x] T049 [P] [US3] Test `specify guides update` shows "already up to date" when no changes in `tests/integration/test_guides_update.py`
+- [x] T050 [P] [US3] Test `specify guides update` fails gracefully when no guides present in `tests/integration/test_guides_update.py`
+- [x] T051 [P] [US3] Test `specify guides update` fails gracefully when not in git repository in `tests/integration/test_guides_update.py`
+- [x] T052 [P] [US3] Test `specify guides update` handles directory exists but not submodule error in `tests/integration/test_guides_update.py`
 
 ### Implementation Verification for User Story 3
 
 **NOTE**: Code already exists from previous implementation - verify it still works
 
-- [ ] T053 [US3] Verify `guides update` command exists and is accessible via CLI in `src/specify_cli/__init__.py`
-- [ ] T054 [US3] Verify `update_guides()` function uses `git submodule update --remote --merge` in `src/specify_cli/__init__.py`
-- [ ] T055 [US3] Verify error handling for missing guides directory in `src/specify_cli/__init__.py`
-- [ ] T056 [US3] Verify error handling for non-git repository in `src/specify_cli/__init__.py`
+- [x] T053 [US3] Verify `guides update` command exists and is accessible via CLI in `src/specify_cli/__init__.py`
+- [x] T054 [US3] Verify `update_guides()` function uses `git submodule update --remote --merge` in `src/specify_cli/__init__.py`
+- [x] T055 [US3] Verify error handling for missing guides directory in `src/specify_cli/__init__.py`
+- [x] T056 [US3] Verify error handling for non-git repository in `src/specify_cli/__init__.py`
 
 ### Documentation for User Story 3
 
-- [ ] T057 [P] [US3] Add `specify guides update` to Commands table in `README.md`
-- [ ] T058 [P] [US3] Document update workflow in `docs/TEAM_INSTALLATION.md`
-- [ ] T059 [P] [US3] Update `specify guides --help` text with current functionality
+- [x] T057 [P] [US3] Add `specify guides update` to Commands table in `README.md`
+- [x] T058 [P] [US3] Document update workflow in `docs/TEAM_INSTALLATION.md`
+- [x] T059 [P] [US3] Update `specify guides --help` text with current functionality
 
 **Checkpoint**: User Story 3 tested and documented - Guides update verified!
 

@@ -160,15 +160,20 @@ If implementation guides are configured for your project:
 ```bash
 # Update guides to the latest version
 specify guides update
-
-# Search guides by keyword
-specify guides search <keyword>
-
-# Display a specific guide  
-specify guides show <guide-path>
 ```
 
-**Note**: Guide repository configuration is set at the binary level during project initialization. To add or change guides, contact your team administrator.
+This command updates the guides repository to the latest version using `git submodule update --remote --merge`. After updating:
+
+- **Changed files**: You'll see a list of modified guide files
+- **Next steps**: Commit the changes to your project repository:
+  ```bash
+  git add context/references
+  git commit -m 'Update implementation guides'
+  git push
+  ```
+- **Already up to date**: If no changes, you'll see "Guides are already up to date"
+
+**Note**: Guide repository configuration is set at the binary level during project initialization. To add or change guides, contact your team administrator or set `SPECIFY_GUIDES_REPO_URL` before running `specify init`.
 
 ### Get Help
 
