@@ -1,6 +1,6 @@
 {
   "name": "@yousourceinc/specify-cli",
-  "version": "0.3.4",
+  "version": "0.4.0",
   "description": "YourSource Specify CLI - Spec-Driven Development with OAuth authentication",
   "main": "bin/specify.js",
   "bin": {

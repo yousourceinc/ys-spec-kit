@@ -184,6 +184,7 @@ The `specify` command supports the following options:
 | `init`      | Initialize a new Specify project from the latest template      |
 | `check`     | Check for installed tools (`git`, `claude`, `gemini`, `code`/`code-insiders`, `cursor-agent`, `windsurf`, `qwen`, `opencode`, `codex`) |
 | `logout`    | Clear GitHub OAuth authentication and remove stored token      |
+| `guides update` | Update implementation guides to the latest version using git submodule |
 
 ### `specify init` Arguments & Options
 
@@ -255,11 +256,42 @@ After running `specify init`, your AI coding agent will have access to these sla
 | `/analyze`      | Cross-artifact consistency & coverage analysis (run after /tasks, before /implement) |
 | `/implement`    | Execute all tasks to build the feature according to the plan         |
 
+### Guides Management (CLI)
+
+Manage implementation guides for your project:
+
+```bash
+# Update guides to the latest version
+specify guides update
+```
+
+**Planned commands** (not yet implemented):
+```bash
+# Search for guides by keyword (coming soon)
+specify guides search <keyword>
+
+# Display a specific guide (coming soon)
+specify guides show <guide-path>
+```
+
+**Setup**: Guide repository is configured at the system level via the `SPECIFY_GUIDES_REPO_URL` environment variable before running `specify init`. Set this variable to automatically integrate implementation guides:
+
+```bash
+# Example: Set guides repository URL
+export SPECIFY_GUIDES_REPO_URL="git@github.com:your-org/implementation-guides.git"
+
+# Initialize project (guides will be cloned automatically)
+specify init my-project --ai claude
+```
+
+**Note**: Guide repository configuration (add/remove) is handled at the binary/system level and cannot be modified by developers at runtime. Developers can only update existing guides to the latest version.
+
 ### Environment Variables
 
 | Variable         | Description                                                                                    |
 |------------------|------------------------------------------------------------------------------------------------|
 | `SPECIFY_FEATURE` | Override feature detection for non-Git repositories. Set to the feature directory name (e.g., `001-photo-albums`) to work on a specific feature when not using Git branches.<br/>**Must be set in the context of the agent you're working with prior to using `/plan` or follow-up commands. |
+| `SPECIFY_GUIDES_REPO_URL` | **System-level configuration** for automatic implementation guides integration. Set to a Git repository URL (e.g., `git@github.com:your-org/implementation-guides.git`) before running `specify init`. When set, this environment variable overrides the default hardcoded guides repository URL. When not set or empty, falls back to the default implementation guides repository. Guides will be automatically cloned as a git submodule into `context/references/`. |
 
 ## 📚 Core philosophy
 
@@ -270,7 +302,43 @@ Spec-Driven Development is a structured process that emphasizes:
 - **Multi-step refinement** rather than one-shot code generation from prompts
 - **Heavy reliance** on advanced AI model capabilities for specification interpretation
 
-## 🌟 Development phases
+## �️ Product Life Cycle Framework
+
+The product life cycle and associated maturity framework typically refer to key stages that a product passes through, from inception to withdrawal from the market. The most widely recognized frameworks break these down into four or five primary levels: development (optional), introduction, growth, maturity, and decline.[1][2][3]
+
+### Primary Product Life Cycle Stages
+
+| Stage         | Description                                                                                                      |
+|---------------|------------------------------------------------------------------------------------------------------------------|
+| Development   | Product is being designed and tested before entering the market (sometimes not considered a public phase)[3]. |
+| Introduction  | Product is launched, sales are low, and marketing focuses on building awareness and adoption[4][5].       |
+| Growth        | Sales accelerate, market acceptance grows, and competition increases as rivals enter the space[2][4].     |
+| Maturity      | Market saturation occurs, growth slows, competition peaks, and emphasis shifts to defending market share[6][4]. |
+| Decline       | Sales decline due to market saturation, technological changes, or shifting consumer preferences[6][4].     |
+
+### Maturity Framework Connection
+
+A maturity framework for a product means defining and measuring the specific attributes or capabilities a product achieves as it moves through these phases. In the maturity stage:
+- The product is widely recognized and adopted by the target market.
+- Sales plateau, and competition is at its most intense.
+- Cost-control, incremental innovation, and market differentiation are primary strategies.
+- Businesses may release product extensions, target new segments, or find efficiency improvements to stay competitive.[7][4]
+
+### Stages in Detail
+
+- **Introduction:** Focus is on education and awareness due to newness in the market; investment is high, and profitability is limited.[5][4]
+- **Growth:** Rapid adoption, increased market share, and attempts to outpace competitors by refining features or marketing.[2][5]
+- **Maturity:** The product's market penetration peaks, sales are stable, and the business shifts from expanding reach to maximizing efficiency and differentiation.[6][4][7]
+- **Decline:** Sales and relevance decrease; the company may retire the product, pivot, or seek to reinvent it.[4][6]
+
+### Key Framework Takeaways
+
+- The stages guide resource allocation, marketing, product improvement, and portfolio management.[3][4]
+- Proactively recognizing the current stage helps companies implement changes, avoid premature decline, and maximize a product's profitability.[7][4]
+
+This cyclical maturity model is foundational in business and product management disciplines, ensuring product teams tailor strategies to the current lifecycle phase for optimal outcomes.[2][3][7]
+
+## �🌟 Development phases
 
 | Phase | Focus | Key Activities |
 |-------|-------|----------------|

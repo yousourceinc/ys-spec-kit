@@ -40,6 +40,21 @@ Use the `/plan` command to provide your tech stack and architecture choices.
 
 Use `/tasks` to create an actionable task list, then ask your agent to implement the feature.
 
+## Using Implementation Guides
+
+If implementation guides are configured for your project, reference them during planning:
+
+```bash
+# Search for relevant guides
+specify guides search authentication
+
+# View a specific guide
+specify guides show security/jwt-implementation
+
+# Keep guides up to date
+specify guides update
+```
+
 ## Detailed Example: Building Taskify
 
 Here's a complete example of building a team productivity platform:
@@ -106,6 +121,28 @@ Finally, implement the solution:
 ```text
 implement specs/002-create-taskify/plan.md
 ```
+
+## Advanced Configuration
+
+### Custom Implementation Guides (CI/CD & Testing)
+
+For CI/CD pipelines and testing environments, you can override the implementation guides repository:
+
+```bash
+# In your CI/CD pipeline or testing environment
+export SPECIFY_GUIDES_REPO_URL="git@github.com:your-org/test-guides.git"
+specify init my-test-project --ai claude
+
+# Or use a staging guides repository for development
+export SPECIFY_GUIDES_REPO_URL="https://github.com/your-org/staging-guides.git"  
+specify init my-dev-project --ai copilot
+```
+
+**Common Override Scenarios:**
+- **Testing**: Use test-specific implementation patterns and examples
+- **Staging**: Point to development/staging guides during feature development  
+- **Organization-specific**: Use company-specific guides for internal projects
+- **Environment separation**: Different guides for prod/dev/test environments
 
 ## Key Principles
 

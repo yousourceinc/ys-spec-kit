@@ -7,12 +7,36 @@ All notable changes to the Specify CLI will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.4.0] - 2025-10-20
+
+### Added
+
+- **Implementation Guides Integration**: Automatic integration of centrally-defined implementation guides
+  - `SPECIFY_GUIDES_REPO_URL` environment variable for system-level guides configuration
+  - Guides automatically cloned as git submodule into `context/references/` during `specify init`
+  - Robust error handling for invalid or inaccessible guide repositories
+- **Guides Management Command**: New `specify guides` CLI command
+  - `specify guides update`: Update guides to latest version using `git submodule update --remote`
+  - Foundation for future `search` and `show` subcommands
+- **Documentation Updates**: Updated README, quickstart, and team installation guides with guides management instructions
+
+### Changed
+
+- Modified `specify init` to check for `SPECIFY_GUIDES_REPO_URL` and clone guides as submodule if set
+- Enhanced project initialization flow with guides integration step
+
+### Notes
+
+- Guide repository configuration (add/remove) is handled at binary level, not exposed to developers
+- Developers can only update, search (planned), and show (planned) guides
+- Guides integration requires git to be available and initialized
+
 ## [0.3.4] - 2025-10-17
 
 ### Changed
 
-- **CLI branding**: Updated ASCII banner to include "YS" (YourSource) branding
-- **Tagline**: Changed to "YourSource Spec Kit - Spec-Driven Development Toolkit"
+- **CLI branding**: Updated ASCII banner to include "YS" (Yousource) branding
+- **Tagline**: Changed to "Yousource Spec Kit - Spec-Driven Development Toolkit"
 
 ## [0.3.3] - 2025-10-16
 

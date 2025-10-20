@@ -131,13 +131,11 @@ Done! Your project is ready.
 # Basic usage
 specify init my-project --ai claude
 
-# With implementation guides
-specify init my-project --ai claude \
-  --guides-repo git@github.com:your-org/implementation-guides.git
-
 # In current directory
 specify init . --ai claude
 ```
+
+**Note**: Implementation guides (if configured) are automatically available after initialization. Use `specify guides` commands to manage them.
 
 ### Logout
 
@@ -154,6 +152,28 @@ Verify installed tools:
 ```bash
 specify check
 ```
+
+### Manage Guides
+
+If implementation guides are configured for your project:
+
+```bash
+# Update guides to the latest version
+specify guides update
+```
+
+This command updates the guides repository to the latest version using `git submodule update --remote --merge`. After updating:
+
+- **Changed files**: You'll see a list of modified guide files
+- **Next steps**: Commit the changes to your project repository:
+  ```bash
+  git add context/references
+  git commit -m 'Update implementation guides'
+  git push
+  ```
+- **Already up to date**: If no changes, you'll see "Guides are already up to date"
+
+**Note**: Guide repository configuration is set at the binary level during project initialization. To add or change guides, contact your team administrator or set `SPECIFY_GUIDES_REPO_URL` before running `specify init`.
 
 ### Get Help
 
@@ -188,8 +208,7 @@ Complete workflow from start to deployment:
 npm install -g @your-org/specify-cli
 
 # 2. Initialize project
-specify init photo-organizer --ai claude \
-  --guides-repo git@github.com:your-org/implementation-guides.git
+specify init photo-organizer --ai claude
 
 # 3. Open in your AI agent (Claude, Copilot, etc.)
 cd photo-organizer
@@ -202,10 +221,9 @@ code .  # or cursor, etc.
 /plan Following our implementation guides
 /tasks
 /implement
-/check-compliance
 
-# 5. Check compliance
-specify compliance report
+# 5. Keep guides updated (if configured)
+specify guides update
 
 # 6. Commit and deploy
 git add .
@@ -347,6 +365,10 @@ specify logout          # Clear authentication
 specify init my-project --ai claude
 specify init . --here --force
 
+# Custom Implementation Guides (optional)
+export SPECIFY_GUIDES_REPO_URL="git@github.com:your-org/custom-guides.git"
+specify init my-project --ai claude  # Uses custom guides
+
 # Tools Check
 specify check
 
@@ -354,6 +376,33 @@ specify check
 specify --help
 specify --version
 ```
+
+## Environment Variables
+
+### Implementation Guides Override
+
+You can override the default implementation guides repository by setting the `SPECIFY_GUIDES_REPO_URL` environment variable:
+
+```bash
+# Set custom guides repository (before running specify init)
+export SPECIFY_GUIDES_REPO_URL="git@github.com:your-org/implementation-guides.git"
+
+# Initialize project with custom guides
+specify init my-project --ai claude
+
+# The guides will be cloned into context/references/ from your custom repository
+```
+
+**Use Cases for Custom Guides:**
+- **Testing environments**: Use a test/staging guides repository
+- **Organization-specific guides**: Use company-specific implementation patterns  
+- **Development workflows**: Use different guides for different project types
+- **CI/CD pipelines**: Override guides repository per environment
+
+**Fallback Behavior:**
+- If `SPECIFY_GUIDES_REPO_URL` is set and valid → Uses override repository
+- If `SPECIFY_GUIDES_REPO_URL` is not set or empty → Uses default guides repository
+- If guides repository is inaccessible → Initialization fails with clear error message
 
 ## Next Steps
 
