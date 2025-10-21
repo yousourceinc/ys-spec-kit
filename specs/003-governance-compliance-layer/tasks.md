@@ -199,15 +199,15 @@
 
 - [x] T105 [P] Add comprehensive logging for all governance operations (waiver creation, compliance checking, rule evaluation)
 - [x] T106 [P] Add performance metrics tracking: rule evaluation times, total check duration
-- [ ] T107 [P] Optimize rule evaluation for large codebases (caching, parallel evaluation if needed)
-- [ ] T108 [P] Add .gitignore entry for compliance-report.md (reports are ephemeral, not committed)
-- [ ] T109 [P] Ensure .specify/waivers.md is NOT in .gitignore (waivers must be committed)
+- [x] T107 [P] Optimize rule evaluation for large codebases (caching, parallel evaluation if needed)
+- [x] T108 [P] Add .gitignore entry for compliance-report.md (reports are ephemeral, not committed)
+- [x] T109 [P] Ensure .specify/waivers.md is NOT in .gitignore (waivers must be committed)
 - [ ] T110 Add division-awareness: respect project division from .specify/project.json
 - [ ] T111 Add guide prioritization: check division-specific guides first
-- [ ] T112 [P] Update README.md with governance layer documentation
-- [ ] T113 [P] Update CHANGELOG.md with v0.4.1 governance layer features
-- [ ] T114 [P] Update pyproject.toml version: 0.4.0 → 0.4.1
-- [ ] T115 [P] Update package.json version: 0.4.0 → 0.4.1
+- [x] T112 [P] Update README.md with governance layer documentation
+- [x] T113 [P] Update CHANGELOG.md with v0.4.1 governance layer features
+- [x] T114 [P] Update pyproject.toml version: 0.4.0 → 0.4.1
+- [x] T115 [P] Update package.json version: 0.4.0 → 0.4.1
 - [ ] T116 Create quickstart guide for governance layer in docs/governance-quickstart.md
 - [ ] T117 Add CLI help text improvements for all governance commands
 - [ ] T118 Add example guides with embedded rules to templates/
