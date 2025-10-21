@@ -197,8 +197,8 @@
 
 **Purpose**: Improvements that affect multiple user stories
 
-- [ ] T105 [P] Add comprehensive logging for all governance operations (waiver creation, compliance checking, rule evaluation)
-- [ ] T106 [P] Add performance metrics tracking: rule evaluation times, total check duration
+- [x] T105 [P] Add comprehensive logging for all governance operations (waiver creation, compliance checking, rule evaluation)
+- [x] T106 [P] Add performance metrics tracking: rule evaluation times, total check duration
 - [ ] T107 [P] Optimize rule evaluation for large codebases (caching, parallel evaluation if needed)
 - [ ] T108 [P] Add .gitignore entry for compliance-report.md (reports are ephemeral, not committed)
 - [ ] T109 [P] Ensure .specify/waivers.md is NOT in .gitignore (waivers must be committed)

@@ -19,6 +19,7 @@ from .rules.engine import RuleEngine
 from .rules.parser import RuleParser
 from .rules import BaseRule
 from .metrics import get_metrics_collector
+from .caching import GuideCacheManager
 
 
 class RuleStatus(str, Enum):
@@ -75,17 +76,20 @@ class ComplianceChecker:
     Evaluates rules, cross-references waivers, and produces aggregated results.
     """
     
-    def __init__(self, project_root: Optional[Path] = None):
+    def __init__(self, project_root: Optional[Path] = None, use_cache: bool = True):
         """
         Initialize ComplianceChecker.
         
         Args:
             project_root: Root directory of project (defaults to current directory)
+            use_cache: Whether to use guide caching (default: True)
         """
         self.project_root = Path(project_root) if project_root else Path(".")
         self.rule_engine = RuleEngine(str(self.project_root))
         self.rule_parser = RuleParser()
         self.waiver_manager = WaiverManager(project_root=self.project_root)
+        self.cache_manager = GuideCacheManager(project_root=self.project_root)
+        self.use_cache = use_cache
     
     def run_compliance_check(
         self,
@@ -187,6 +191,14 @@ class ComplianceChecker:
             List of discovered guide paths
         """
         logger.debug("Discovering guides in project")
+        
+        # Check cache first if enabled
+        if self.use_cache:
+            cached_guides = self.cache_manager.get_guides()
+            if cached_guides is not None:
+                logger.debug(f"Using cached guides: {len(cached_guides)} guides")
+                return cached_guides
+        
         guides = []
         
         # Look in context/references/ if it exists
@@ -204,6 +216,11 @@ class ComplianceChecker:
             logger.debug(f"Found {len(specs)} guides in specs/")
         
         logger.debug(f"Total guides discovered: {len(guides)}")
+        
+        # Cache results if enabled
+        if self.use_cache and guides:
+            self.cache_manager.save_guides(guides)
+        
         return guides
     
     def _evaluate_rule(
