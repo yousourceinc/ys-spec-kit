@@ -92,47 +92,47 @@
 
 ### Implementation for User Story 2
 
-- [ ] T036 [US2] Implement GuideDiscovery class to parse plan.md/tasks.md for guide references in src/specify_cli/governance/discovery.py
-- [ ] T037 [US2] Implement find_guide_files() to locate guides in context/references/ in src/specify_cli/governance/discovery.py
-- [ ] T038 [US2] Implement ComplianceChecker class with run_compliance_check() in src/specify_cli/governance/compliance.py
-- [ ] T039 [US2] Implement evaluate_rules_with_waivers() to cross-reference waivers in src/specify_cli/governance/compliance.py
-- [ ] T040 [US2] Implement RuleEvaluationResult data class in src/specify_cli/governance/compliance.py
-- [ ] T041 [US2] Integrate RuleEngine with ComplianceChecker for rule evaluation
-- [ ] T042 [US2] Integrate RuleParser to extract rules from discovered guides
-- [ ] T043 [US2] Integrate WaiverManager to load and match waivers to failed rules
-- [ ] T044 [US2] Implement waiver matching logic: rule_id → waiver_id lookup
-- [ ] T045 [US2] Implement status determination: pass/fail/waived/error
-- [ ] T046 [US2] Implement ComplianceReportGenerator class in src/specify_cli/governance/report.py
-- [ ] T047 [US2] Implement generate_report_header() with timestamp and status in src/specify_cli/governance/report.py
-- [ ] T048 [US2] Implement generate_summary_section() with pass/fail/waive counts in src/specify_cli/governance/report.py
-- [ ] T049 [US2] Implement generate_checked_guides_section() in src/specify_cli/governance/report.py
-- [ ] T050 [US2] Implement generate_passed_rules_section() in src/specify_cli/governance/report.py
-- [ ] T051 [US2] Implement generate_failed_rules_section() with recommendations in src/specify_cli/governance/report.py
-- [ ] T052 [US2] Implement generate_waived_rules_section() with waiver references in src/specify_cli/governance/report.py
-- [ ] T053 [US2] Implement generate_error_rules_section() (optional) in src/specify_cli/governance/report.py
-- [ ] T054 [US2] Implement write_report_to_file() to generate compliance-report.md in src/specify_cli/governance/report.py
-- [ ] T055 [US2] Add check_compliance CLI command to src/specify_cli/__init__.py using Typer
-- [ ] T056 [US2] Implement command handler for /check-compliance in src/specify_cli/__init__.py
-- [ ] T057 [US2] Add Rich formatting for compliance check progress and results
-- [ ] T058 [US2] Add error handling for missing plan.md/tasks.md
-- [ ] T059 [US2] Add error handling for no guides found
-- [ ] T060 [US2] Add error handling for invalid rule syntax in guides
-- [ ] T061 [US2] Create unit tests for GuideDiscovery in tests/unit/governance/test_guide_discovery.py
-- [ ] T062 [US2] Create unit tests for ComplianceChecker in tests/unit/governance/test_compliance_checker.py
-- [ ] T063 [US2] Create unit tests for ComplianceReportGenerator in tests/unit/governance/test_report_generator.py
-- [ ] T064 [US2] Create integration test for check_compliance command in tests/integration/governance/test_check_compliance_command.py
-- [ ] T065 [US2] Test guide discovery from plan.md references
-- [ ] T066 [US2] Test rule extraction from YAML frontmatter
-- [ ] T067 [US2] Test rule evaluation: file_exists checks
-- [ ] T068 [US2] Test rule evaluation: dependency_present checks
-- [ ] T069 [US2] Test rule evaluation: text_includes checks
-- [ ] T070 [US2] Test waiver matching: failed rule + waiver = "Waived" status
-- [ ] T071 [US2] Test report generation: all sections present
-- [ ] T072 [US2] Test report generation: accurate pass/fail/waive counts
-- [ ] T073 [US2] Test error handling: guide not found
-- [ ] T074 [US2] Test error handling: invalid YAML in guide
-- [ ] T075 [US2] Test error handling: missing plan.md
-- [ ] T076 [US2] Add help text and examples for /check-compliance command
+- [x] T036 [US2] Implement GuideDiscovery class to parse plan.md/tasks.md for guide references in src/specify_cli/governance/discovery.py
+- [x] T037 [US2] Implement find_guide_files() to locate guides in context/references/ in src/specify_cli/governance/discovery.py
+- [x] T038 [US2] Implement ComplianceChecker class with run_compliance_check() in src/specify_cli/governance/compliance.py
+- [x] T039 [US2] Implement evaluate_rules_with_waivers() to cross-reference waivers in src/specify_cli/governance/compliance.py
+- [x] T040 [US2] Implement RuleEvaluationResult data class in src/specify_cli/governance/compliance.py
+- [x] T041 [US2] Integrate RuleEngine with ComplianceChecker for rule evaluation
+- [x] T042 [US2] Integrate RuleParser to extract rules from discovered guides
+- [x] T043 [US2] Integrate WaiverManager to load and match waivers to failed rules
+- [x] T044 [US2] Implement waiver matching logic: rule_id → waiver_id lookup
+- [x] T045 [US2] Implement status determination: pass/fail/waived/error
+- [x] T046 [US2] Implement ComplianceReportGenerator class in src/specify_cli/governance/report.py
+- [x] T047 [US2] Implement generate_report_header() with timestamp and status in src/specify_cli/governance/report.py
+- [x] T048 [US2] Implement generate_summary_section() with pass/fail/waive counts in src/specify_cli/governance/report.py
+- [x] T049 [US2] Implement generate_checked_guides_section() in src/specify_cli/governance/report.py
+- [x] T050 [US2] Implement generate_passed_rules_section() in src/specify_cli/governance/report.py
+- [x] T051 [US2] Implement generate_failed_rules_section() with recommendations in src/specify_cli/governance/report.py
+- [x] T052 [US2] Implement generate_waived_rules_section() with waiver references in src/specify_cli/governance/report.py
+- [x] T053 [US2] Implement generate_error_rules_section() (optional) in src/specify_cli/governance/report.py
+- [x] T054 [US2] Implement write_report_to_file() to generate compliance-report.md in src/specify_cli/governance/report.py
+- [x] T055 [US2] Add check_compliance CLI command to src/specify_cli/__init__.py using Typer
+- [x] T056 [US2] Implement command handler for /check-compliance in src/specify_cli/__init__.py
+- [x] T057 [US2] Add Rich formatting for compliance check progress and results
+- [x] T058 [US2] Add error handling for missing plan.md/tasks.md
+- [x] T059 [US2] Add error handling for no guides found
+- [x] T060 [US2] Add error handling for invalid rule syntax in guides
+- [x] T061 [US2] Create unit tests for GuideDiscovery in tests/unit/governance/test_guide_discovery.py
+- [x] T062 [US2] Create unit tests for ComplianceChecker in tests/unit/governance/test_compliance_checker.py
+- [x] T063 [US2] Create unit tests for ComplianceReportGenerator in tests/unit/governance/test_report_generator.py
+- [x] T064 [US2] Create integration test for check_compliance command in tests/integration/governance/test_check_compliance_command.py
+- [x] T065 [US2] Test guide discovery from plan.md references
+- [x] T066 [US2] Test rule extraction from YAML frontmatter
+- [x] T067 [US2] Test rule evaluation: file_exists checks
+- [x] T068 [US2] Test rule evaluation: dependency_present checks
+- [x] T069 [US2] Test rule evaluation: text_includes checks
+- [x] T070 [US2] Test waiver matching: failed rule + waiver = "Waived" status
+- [x] T071 [US2] Test report generation: all sections present
+- [x] T072 [US2] Test report generation: accurate pass/fail/waive counts
+- [x] T073 [US2] Test error handling: guide not found
+- [x] T074 [US2] Test error handling: invalid YAML in guide
+- [x] T075 [US2] Test error handling: missing plan.md
+- [x] T076 [US2] Add help text and examples for /check-compliance command
 
 **Checkpoint**: Developers can now run `/check-compliance` to verify code against guides - Core compliance enforcement complete
 
