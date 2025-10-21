@@ -8,6 +8,9 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import List, Dict, Optional, Set
 from collections import defaultdict
+import logging
+
+logger = logging.getLogger(__name__)
 
 from .compliance import RuleEvaluationResult, RuleStatus
 
@@ -52,6 +55,8 @@ class ComplianceReportGenerator:
         Returns:
             Formatted markdown report as string
         """
+        logger.info(f"Generating compliance report for {len(results)} rule evaluations")
+        
         if project_name is None:
             project_name = self.project_root.name
         
@@ -72,6 +77,7 @@ class ComplianceReportGenerator:
         report += self.generate_waived_rules_section(results)
         report += self.generate_error_rules_section(results)
         
+        logger.debug("Report generation complete")
         return report
     
     def generate_report_header(

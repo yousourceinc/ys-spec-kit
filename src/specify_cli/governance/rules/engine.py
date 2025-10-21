@@ -5,6 +5,10 @@ Manages rule registration, evaluation, and provides rule factory.
 """
 
 from typing import List, Dict, Any
+import logging
+
+logger = logging.getLogger(__name__)
+
 from .file_rules import FileExistsRule
 from .dependency_rules import DependencyPresentRule
 from .text_rules import TextIncludesRule
@@ -53,11 +57,15 @@ class RuleEngine:
                 - details: Additional context
                 - description: Rule description
         """
+        logger.debug(f"Evaluating {len(self.rules)} registered rules")
         results = []
         
         for rule in self.rules:
+            logger.debug(f"Evaluating rule: {rule.id} ({rule.TYPE})")
             try:
                 evaluation = rule.evaluate(self.project_root)
+                status = "PASS" if evaluation['passed'] else "FAIL"
+                logger.debug(f"Rule {rule.id}: {status} - {evaluation['message']}")
                 results.append({
                     'rule_id': rule.id,
                     'rule_type': rule.TYPE,
@@ -68,6 +76,7 @@ class RuleEngine:
                 })
             except Exception as e:
                 # Rule evaluation error - mark as error status
+                logger.error(f"Error evaluating rule {rule.id}: {str(e)}")
                 results.append({
                     'rule_id': rule.id,
                     'rule_type': rule.TYPE,
@@ -78,6 +87,7 @@ class RuleEngine:
                     'error': True,
                 })
         
+        logger.debug(f"Rule evaluation complete: {len(results)} results")
         return results
     
     @staticmethod

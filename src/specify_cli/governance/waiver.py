@@ -9,6 +9,9 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Dict, List, Optional, Any
 import re
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 class Waiver:
@@ -158,9 +161,11 @@ class WaiverManager:
             ValueError: If reason is empty or invalid
         """
         if not reason or not reason.strip():
+            logger.warning("Attempt to create waiver with empty reason")
             raise ValueError("Waiver reason cannot be empty")
         
         if len(reason) > 500:
+            logger.warning("Attempt to create waiver with reason exceeding 500 chars")
             raise ValueError("Waiver reason cannot exceed 500 characters")
         
         # Generate timestamp in ISO-8601 format
@@ -169,6 +174,8 @@ class WaiverManager:
         # Read existing waivers to generate next ID
         existing_waivers = self.parse_waivers_file()
         waiver_id = self.generate_waiver_id(existing_waivers)
+        
+        logger.debug(f"Generating new waiver ID: {waiver_id}")
         
         # Create waiver instance
         waiver = Waiver(
@@ -182,6 +189,7 @@ class WaiverManager:
         # Append to file
         self.append_to_waivers_file(waiver)
         
+        logger.info(f"Created waiver {waiver_id} for rules: {related_rules or 'N/A'}")
         return waiver
     
     def append_to_waivers_file(self, waiver: Waiver) -> None:
@@ -193,9 +201,11 @@ class WaiverManager:
         """
         # Create .specify directory if needed
         self.waivers_dir.mkdir(parents=True, exist_ok=True)
+        logger.debug(f"Waivers directory ready: {self.waivers_dir}")
         
         # Create or update file
         if not self.waivers_file.exists():
+            logger.debug(f"Creating new waivers file: {self.waivers_file}")
             # Create new file with header
             header = "# Compliance Waivers\n\n"
             header += "Formal exceptions to compliance requirements.\n"
@@ -213,6 +223,7 @@ class WaiverManager:
         
         with open(self.waivers_file, 'a') as f:
             f.write(entry)
+        logger.debug(f"Appended waiver {waiver.waiver_id} to {self.waivers_file}")
     
     def parse_waivers_file(self) -> List[Waiver]:
         """
@@ -222,8 +233,10 @@ class WaiverManager:
             List of Waiver instances (empty if file doesn't exist)
         """
         if not self.waivers_file.exists():
+            logger.debug(f"Waivers file does not exist: {self.waivers_file}")
             return []
         
+        logger.debug(f"Parsing waivers file: {self.waivers_file}")
         content = self.waivers_file.read_text()
         waivers = []
         
@@ -257,7 +270,9 @@ class WaiverManager:
                     created_by=created_by
                 )
                 waivers.append(waiver)
+                logger.debug(f"Parsed waiver {waiver_id}")
         
+        logger.debug(f"Parsed {len(waivers)} waivers from file")
         return waivers
     
     def get_waiver_by_id(self, waiver_id: str) -> Optional[Waiver]:
@@ -270,10 +285,13 @@ class WaiverManager:
         Returns:
             Waiver instance if found, None otherwise
         """
+        logger.debug(f"Looking up waiver: {waiver_id}")
         waivers = self.parse_waivers_file()
         for waiver in waivers:
             if waiver.waiver_id == waiver_id:
+                logger.debug(f"Found waiver: {waiver_id}")
                 return waiver
+        logger.warning(f"Waiver not found: {waiver_id}")
         return None
     
     def list_waivers(self) -> List[Waiver]:

@@ -10,11 +10,15 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Dict, List, Optional, Any
 from enum import Enum
+import logging
+
+logger = logging.getLogger(__name__)
 
 from .waiver import WaiverManager, Waiver
 from .rules.engine import RuleEngine
 from .rules.parser import RuleParser
 from .rules import BaseRule
+from .metrics import get_metrics_collector
 
 
 class RuleStatus(str, Enum):
@@ -96,19 +100,33 @@ class ComplianceChecker:
         Returns:
             List of rule evaluation results
         """
+        logger.info("Starting compliance check")
+        
+        # Start metrics collection
+        metrics = get_metrics_collector().start_check()
+        
         results = []
         
         # If no guides provided, discover them
         if guides is None:
+            logger.debug("Discovering guides from project")
             guides = self._discover_guides()
+            logger.info(f"Discovered {len(guides)} guides")
+        else:
+            logger.debug(f"Using {len(guides)} provided guides")
+        
+        metrics.guides_count = len(guides)
         
         # Load existing waivers
+        logger.debug("Loading waivers")
         waivers = self.waiver_manager.list_waivers()
         waiver_map = self._build_waiver_map(waivers)
+        logger.debug(f"Loaded {len(waiver_map)} waivers")
         
         # Extract and evaluate rules from each guide
         for guide_path in guides:
             if not guide_path.exists():
+                logger.warning(f"Guide file not found: {guide_path}")
                 results.append(
                     RuleEvaluationResult(
                         rule_id="discovery-error",
@@ -121,10 +139,12 @@ class ComplianceChecker:
                 )
                 continue
             
+            logger.debug(f"Processing guide: {guide_path}")
             # Extract rules from guide
             try:
                 rules_data = self.rule_parser.extract_rules(guide_path)
                 guide_id = self._extract_guide_id(guide_path)
+                logger.debug(f"Extracted {len(rules_data)} rules from {guide_id}")
                 
                 for rule_data in rules_data:
                     result = self._evaluate_rule(
@@ -133,8 +153,10 @@ class ComplianceChecker:
                         waiver_map
                     )
                     results.append(result)
+                    logger.debug(f"Rule {result.rule_id}: {result.status.value}")
             
             except Exception as e:
+                logger.error(f"Failed to parse guide {guide_path}: {str(e)}")
                 results.append(
                     RuleEvaluationResult(
                         rule_id="parse-error",
@@ -146,6 +168,11 @@ class ComplianceChecker:
                     )
                 )
         
+        # Finalize metrics
+        metrics.rules_count = len(results)
+        get_metrics_collector().end_check()
+        
+        logger.info(f"Compliance check complete: {len(results)} rules evaluated")
         return results
     
     def _discover_guides(self) -> List[Path]:
@@ -159,18 +186,24 @@ class ComplianceChecker:
         Returns:
             List of discovered guide paths
         """
+        logger.debug("Discovering guides in project")
         guides = []
         
         # Look in context/references/ if it exists
         guides_dir = self.project_root / "context" / "references"
         if guides_dir.exists():
-            guides.extend(guides_dir.glob("*.md"))
+            refs = list(guides_dir.glob("*.md"))
+            guides.extend(refs)
+            logger.debug(f"Found {len(refs)} guides in context/references/")
         
         # Look for guides in specs/ directory
         specs_dir = self.project_root / "specs"
         if specs_dir.exists():
-            guides.extend(specs_dir.glob("**/*.md"))
+            specs = list(specs_dir.glob("**/*.md"))
+            guides.extend(specs)
+            logger.debug(f"Found {len(specs)} guides in specs/")
         
+        logger.debug(f"Total guides discovered: {len(guides)}")
         return guides
     
     def _evaluate_rule(
