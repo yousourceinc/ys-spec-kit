@@ -146,21 +146,22 @@
 
 ### Implementation for User Story 3
 
-- [ ] T077 [US3] Enhance format_waiver_entry() to ensure chronological ordering in src/specify_cli/governance/waiver.py
-- [ ] T078 [US3] Implement list_waivers() method for programmatic access in src/specify_cli/governance/waiver.py
-- [ ] T079 [US3] Implement get_waiver_by_id() for lookup in src/specify_cli/governance/waiver.py
-- [ ] T080 [US3] Add optional waiver list command: /waivers list (displays all waivers)
-- [ ] T081 [US3] Add optional waiver show command: /waivers show W-XXX (displays specific waiver)
-- [ ] T082 [US3] Add Rich table formatting for waiver list display
-- [ ] T083 [US3] Enhance compliance report to include clickable waiver references
-- [ ] T084 [US3] Add waiver statistics to compliance report summary (total waivers, recent waivers)
-- [ ] T085 [US3] Create integration test for waivers list command in tests/integration/governance/test_waivers_command.py
-- [ ] T086 [US3] Test chronological ordering of waivers in .specify/waivers.md
-- [ ] T087 [US3] Test cross-reference between compliance-report.md and waivers.md
-- [ ] T088 [US3] Test waiver lookup by ID
-- [ ] T089 [US3] Add documentation for team lead governance review workflow
+- [x] T077 [US3] Enhance format_waiver_entry() to ensure chronological ordering in src/specify_cli/governance/waiver.py
+- [x] T078 [US3] Implement list_waivers() method for programmatic access in src/specify_cli/governance/waiver.py
+- [x] T079 [US3] Implement get_waiver_by_id() for lookup in src/specify_cli/governance/waiver.py
+- [x] T080 [US3] Add optional waiver list command: /waivers list (displays all waivers)
+- [x] T081 [US3] Add optional waiver show command: /waivers show W-XXX (displays specific waiver)
+- [x] T082 [US3] Add Rich table formatting for waiver list display
+- [x] T083 [US3] Enhance compliance report to include clickable waiver references
+- [x] T084 [US3] Add waiver statistics to compliance report summary (total waivers, recent waivers)
+- [x] T085 [US3] Create integration test for waivers list command in tests/integration/governance/test_waivers_command.py
+- [x] T086 [US3] Test chronological ordering of waivers in .specify/waivers.md
+- [x] T087 [US3] Test cross-reference between compliance-report.md and waivers.md
+- [x] T088 [US3] Test waiver lookup by ID
+- [x] T089 [US3] Add documentation for team lead governance review workflow
 
 **Checkpoint**: Team leads can review governance audit trail via .specify/waivers.md and compliance reports
+
 
 ---
 
