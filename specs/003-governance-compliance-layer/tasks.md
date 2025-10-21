@@ -62,23 +62,23 @@
 
 ### Implementation for User Story 1
 
-- [ ] T019 [US1] Implement WaiverManager class with create_waiver() method in src/specify_cli/governance/waiver.py
-- [ ] T020 [US1] Implement generate_waiver_id() to auto-increment W-XXX format in src/specify_cli/governance/waiver.py
-- [ ] T021 [US1] Implement format_waiver_entry() for markdown structure in src/specify_cli/governance/waiver.py
-- [ ] T022 [US1] Implement append_to_waivers_file() with file creation if needed in src/specify_cli/governance/waiver.py
-- [ ] T023 [US1] Implement parse_waivers_file() to read existing waivers in src/specify_cli/governance/waiver.py
-- [ ] T024 [US1] Add waive_requirement CLI command to src/specify_cli/__init__.py using Typer
-- [ ] T025 [US1] Implement command handler for /waive-requirement with reason validation in src/specify_cli/__init__.py
-- [ ] T026 [US1] Add Rich formatting for success/error messages in waive_requirement command
-- [ ] T027 [US1] Add validation for empty/missing reason with clear error message
-- [ ] T028 [US1] Create unit tests for WaiverManager in tests/unit/governance/test_waiver_manager.py
-- [ ] T029 [US1] Create integration test for waive_requirement command in tests/integration/governance/test_waive_requirement_command.py
-- [ ] T030 [US1] Test waiver file creation when .specify/waivers.md doesn't exist
-- [ ] T031 [US1] Test waiver appending when .specify/waivers.md already exists
-- [ ] T032 [US1] Test waiver ID auto-increment (W-001, W-002, W-003)
-- [ ] T033 [US1] Test ISO-8601 timestamp format validation
-- [ ] T034 [US1] Test error handling for empty reason
-- [ ] T035 [US1] Add help text and examples for /waive-requirement command
+- [x] T019 [US1] Implement WaiverManager class with create_waiver() method in src/specify_cli/governance/waiver.py
+- [x] T020 [US1] Implement generate_waiver_id() to auto-increment W-XXX format in src/specify_cli/governance/waiver.py
+- [x] T021 [US1] Implement format_waiver_entry() for markdown structure in src/specify_cli/governance/waiver.py
+- [x] T022 [US1] Implement append_to_waivers_file() with file creation if needed in src/specify_cli/governance/waiver.py
+- [x] T023 [US1] Implement parse_waivers_file() to read existing waivers in src/specify_cli/governance/waiver.py
+- [x] T024 [US1] Add waive_requirement CLI command to src/specify_cli/__init__.py using Typer
+- [x] T025 [US1] Implement command handler for /waive-requirement with reason validation in src/specify_cli/__init__.py
+- [x] T026 [US1] Add Rich formatting for success/error messages in waive_requirement command
+- [x] T027 [US1] Add validation for empty/missing reason with clear error message
+- [x] T028 [US1] Create unit tests for WaiverManager in tests/unit/governance/test_waiver_manager.py
+- [x] T029 [US1] Create integration test for waive_requirement command in tests/integration/governance/test_waive_requirement_command.py
+- [x] T030 [US1] Test waiver file creation when .specify/waivers.md doesn't exist
+- [x] T031 [US1] Test waiver appending when .specify/waivers.md already exists
+- [x] T032 [US1] Test waiver ID auto-increment (W-001, W-002, W-003)
+- [x] T033 [US1] Test ISO-8601 timestamp format validation
+- [x] T034 [US1] Test error handling for empty reason
+- [x] T035 [US1] Add help text and examples for /waive-requirement command
 
 **Checkpoint**: Engineers can now record waivers with `/waive-requirement "reason"` - MVP feature complete
 
