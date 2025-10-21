@@ -173,21 +173,21 @@
 
 ### Implementation for User Story 4
 
-- [ ] T090 [US4] Enhance RuleParser to validate YAML frontmatter structure in src/specify_cli/governance/rules/parser.py
-- [ ] T091 [US4] Implement validate_rule_structure() for each rule type in src/specify_cli/governance/rules/parser.py
-- [ ] T092 [US4] Add comprehensive error messages for malformed rules (missing fields, invalid types)
-- [ ] T093 [US4] Add rule syntax validation: check required fields per rule type
-- [ ] T094 [US4] Implement rule linting: detect common mistakes (wrong field names, invalid paths)
-- [ ] T095 [US4] Create guide authoring template with example rules in .specify/templates/guide-template.md
-- [ ] T096 [US4] Add division field validation in YAML frontmatter
-- [ ] T097 [US4] Test rule parsing: valid YAML with all rule types
-- [ ] T098 [US4] Test rule parsing: malformed YAML (syntax errors)
-- [ ] T099 [US4] Test rule parsing: missing required fields
-- [ ] T100 [US4] Test rule parsing: invalid rule types
-- [ ] T101 [US4] Test rule parsing: multiple rules in single guide
-- [ ] T102 [US4] Create example implementation guide with embedded rules in tests/fixtures/governance/
-- [ ] T103 [US4] Add documentation for guide authors: "How to Embed Compliance Rules"
-- [ ] T104 [US4] Add rule authoring best practices documentation
+- [x] T090 [US4] Enhance RuleParser to validate YAML frontmatter structure in src/specify_cli/governance/rules/parser.py
+- [x] T091 [US4] Implement validate_rule_structure() for each rule type in src/specify_cli/governance/rules/parser.py
+- [x] T092 [US4] Add comprehensive error messages for malformed rules (missing fields, invalid types)
+- [x] T093 [US4] Add rule syntax validation: check required fields per rule type
+- [x] T094 [US4] Implement rule linting: detect common mistakes (wrong field names, invalid paths)
+- [x] T095 [US4] Create guide authoring template with example rules in .specify/templates/guide-template.md
+- [x] T096 [US4] Add division field validation in YAML frontmatter
+- [x] T097 [US4] Test rule parsing: valid YAML with all rule types
+- [x] T098 [US4] Test rule parsing: malformed YAML (syntax errors)
+- [x] T099 [US4] Test rule parsing: missing required fields
+- [x] T100 [US4] Test rule parsing: invalid rule types
+- [x] T101 [US4] Test rule parsing: multiple rules in single guide
+- [x] T102 [US4] Create example implementation guide with embedded rules in tests/fixtures/governance/
+- [x] T103 [US4] Add documentation for guide authors: "How to Embed Compliance Rules"
+- [x] T104 [US4] Add rule authoring best practices documentation
 
 **Checkpoint**: Guide authors can embed compliance rules in YAML frontmatter with validation and helpful error messages
 
