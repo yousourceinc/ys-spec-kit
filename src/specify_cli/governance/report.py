@@ -118,6 +118,9 @@ class ComplianceReportGenerator:
         error_count = sum(1 for r in results if r.status == RuleStatus.ERROR)
         total = len(results)
         
+        # Get unique waivers referenced
+        unique_waivers = set(r.waiver_id for r in results if r.waiver_id and r.status == RuleStatus.WAIVED)
+        
         # Determine overall status
         if fail_count > 0:
             overall_status = "⚠️ PARTIAL (failures found)"
@@ -136,7 +139,13 @@ class ComplianceReportGenerator:
         summary += f"| ✅ Passed | {pass_count} |\n"
         summary += f"| ❌ Failed | {fail_count} |\n"
         summary += f"| 🚫 Waived | {waived_count} |\n"
-        summary += f"| ⚠️ Errors | {error_count} |\n\n"
+        summary += f"| ⚠️ Errors | {error_count} |\n"
+        
+        # Add waiver statistics if any waivers present
+        if unique_waivers:
+            summary += f"| 📋 Active Waivers | {len(unique_waivers)} |\n"
+        
+        summary += f"\n"
         
         return summary
     
