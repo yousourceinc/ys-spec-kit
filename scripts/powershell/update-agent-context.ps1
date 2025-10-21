@@ -63,6 +63,8 @@ $script:NEW_LANG = ''
 $script:NEW_FRAMEWORK = ''
 $script:NEW_DB = ''
 $script:NEW_PROJECT_TYPE = ''
+$script:PROJECT_DIVISION = ''
+$script:GUIDES_PATH = ''
 
 function Write-Info { 
     param(
@@ -94,6 +96,109 @@ function Write-Err {
         [string]$Message
     )
     Write-Host "ERROR: $Message" -ForegroundColor Red 
+}
+
+function Get-ProjectDivision {
+    param(
+        [Parameter(Mandatory=$true)]
+        [string]$ProjectRoot
+    )
+    
+    $configFile = Join-Path $ProjectRoot '.specify/project.json'
+    try {
+        if (Test-Path $configFile) {
+            $config = Get-Content -LiteralPath $configFile -Raw | ConvertFrom-Json
+            return $config.division
+        } else {
+            return 'SE'
+        }
+    } catch {
+        return 'SE'
+    }
+}
+
+function Get-PrioritizedGuides {
+    param(
+        [Parameter(Mandatory=$true)]
+        [string]$Division,
+        [Parameter(Mandatory=$true)]
+        [string]$GuidesPath
+    )
+    
+    $referencesPath = Join-Path $GuidesPath 'context/references'
+    $result = @{
+        primary = @()
+        common = @()
+        other = @{}
+    }
+    
+    if (-not (Test-Path $referencesPath)) {
+        return $result
+    }
+    
+    try {
+        $divisionGuides = @{}
+        Get-ChildItem -LiteralPath $referencesPath -Directory | Where-Object { -not $_.Name.StartsWith('.') } | ForEach-Object {
+            $guides = @()
+            try {
+                Get-ChildItem -LiteralPath $_.FullName -Filter '*.md' | ForEach-Object {
+                    $guides += [System.IO.Path]::GetRelativePath($GuidesPath, $_.FullName)
+                }
+            } catch {
+                # Skip directories we can't read
+            }
+            $divisionGuides[$_.Name] = $guides | Sort-Object
+        }
+        
+        $result.primary = $divisionGuides[$Division]
+        $result.common = $divisionGuides['Common']
+        
+        $otherGuides = @{}
+        $divisionGuides.Keys | Where-Object { $_ -ne $Division -and $_ -ne 'Common' } | ForEach-Object {
+            $otherGuides[$_] = $divisionGuides[$_]
+        }
+        $result.other = $otherGuides
+        
+        return $result
+        
+    } catch {
+        return $result
+    }
+}
+
+function Add-PrioritizedGuides {
+    param(
+        [Parameter(Mandatory=$true)]
+        [System.Collections.Generic.List[string]]$Output,
+        [Parameter(Mandatory=$true)]
+        [hashtable]$GuidesData
+    )
+    
+    # Add division
+    $Output.Add("**Division**: $PROJECT_DIVISION")
+    $Output.Add('')
+    
+    # Primary division guides
+    if ($GuidesData.primary -and $GuidesData.primary.Count -gt 0) {
+        $Output.Add("**$PROJECT_DIVISION Division Guides**:")
+        $GuidesData.primary | ForEach-Object { $Output.Add("- $_") }
+        $Output.Add('')
+    }
+    
+    # Common guides
+    if ($GuidesData.common -and $GuidesData.common.Count -gt 0) {
+        $Output.Add("**Common Guides**:")
+        $GuidesData.common | ForEach-Object { $Output.Add("- $_") }
+        $Output.Add('')
+    }
+    
+    # Other division guides
+    $GuidesData.other.Keys | Where-Object { $GuidesData.other[$_] -and $GuidesData.other[$_].Count -gt 0 } | ForEach-Object {
+        $div = $_
+        $Output.Add("**$div Division Guides**:")
+        $GuidesData.other[$div] | ForEach-Object { $Output.Add("- $_") }
+        $Output.Add('')
+    }
 }
 
 function Validate-Environment {
@@ -212,6 +317,12 @@ function New-AgentFile {
     $commands = Get-CommandsForLanguage -Lang $NEW_LANG
     $languageConventions = Get-LanguageConventions -Lang $NEW_LANG
 
+    # Get prioritized guides for new files
+    $guidesData = Get-PrioritizedGuides -Division $PROJECT_DIVISION -GuidesPath $GUIDES_PATH
+    $guidesContent = New-Object System.Collections.Generic.List[string]
+    Add-PrioritizedGuides -Output $guidesContent -GuidesData $guidesData
+    $guidesSection = $guidesContent -join [Environment]::NewLine
+
     $escaped_lang = $NEW_LANG
     $escaped_framework = $NEW_FRAMEWORK
     $escaped_branch = $CURRENT_BRANCH
@@ -237,6 +348,7 @@ function New-AgentFile {
     # Replace escaped newlines placeholder after all replacements
     $content = $content -replace '\[ONLY COMMANDS FOR ACTIVE TECHNOLOGIES\]',$commands
     $content = $content -replace '\[LANGUAGE-SPECIFIC, ONLY FOR LANGUAGES IN USE\]',$languageConventions
+    $content = $content -replace '\[GUIDES SECTION\]',$guidesSection
     
     # Build the recent changes string safely
     $recentChangesForTemplate = ""
@@ -286,9 +398,12 @@ function Update-ExistingAgentFile {
     if ($techStack) { $newChangeEntry = "- ${CURRENT_BRANCH}: Added ${techStack}" }
     elseif ($NEW_DB -and $NEW_DB -notin @('N/A','NEEDS CLARIFICATION')) { $newChangeEntry = "- ${CURRENT_BRANCH}: Added ${NEW_DB}" }
 
+    # Get prioritized guides
+    $guidesData = Get-PrioritizedGuides -Division $PROJECT_DIVISION -GuidesPath $GUIDES_PATH
+
     $lines = Get-Content -LiteralPath $TargetFile -Encoding utf8
     $output = New-Object System.Collections.Generic.List[string]
-    $inTech = $false; $inChanges = $false; $techAdded = $false; $changeAdded = $false; $existingChanges = 0
+    $inTech = $false; $inChanges = $false; $inGuides = $false; $techAdded = $false; $changeAdded = $false; $guidesAdded = $false; $existingChanges = 0
 
     for ($i=0; $i -lt $lines.Count; $i++) {
         $line = $lines[$i]
@@ -305,6 +420,17 @@ function Update-ExistingAgentFile {
             if (-not $techAdded -and $newTechEntries.Count -gt 0) { $newTechEntries | ForEach-Object { $output.Add($_) }; $techAdded = $true }
             $output.Add($line); continue
         }
+        if ($line -eq '## Guides') {
+            $output.Add($line)
+            $inGuides = $true
+            # Add prioritized guides
+            if (-not $guidesAdded) { 
+                Add-PrioritizedGuides -Output $output -GuidesData $guidesData
+                $guidesAdded = $true 
+            }
+            continue
+        }
+        if ($inGuides -and $line -match '^##\s') { $output.Add($line); $inGuides = $false; continue }
         if ($line -eq '## Recent Changes') {
             $output.Add($line)
             if ($newChangeEntry) { $output.Add($newChangeEntry); $changeAdded = $true }
@@ -326,6 +452,25 @@ function Update-ExistingAgentFile {
     # Post-loop check: if we're still in the Active Technologies section and haven't added new entries
     if ($inTech -and -not $techAdded -and $newTechEntries.Count -gt 0) {
         $newTechEntries | ForEach-Object { $output.Add($_) }
+    }
+
+    # If no Guides section was found, add it before Recent Changes
+    if (-not $guidesAdded) {
+        $tempOutput = New-Object System.Collections.Generic.List[string]
+        $foundRecentChanges = $false
+        for ($i=0; $i -lt $output.Count; $i++) {
+            $line = $output[$i]
+            if ($line -eq '## Recent Changes' -and -not $foundRecentChanges) {
+                $tempOutput.Add('## Guides')
+                Add-PrioritizedGuides -Output $tempOutput -GuidesData $guidesData
+                $tempOutput.Add('')
+                $tempOutput.Add($line)
+                $foundRecentChanges = $true
+            } else {
+                $tempOutput.Add($line)
+            }
+        }
+        $output = $tempOutput
     }
 
     Set-Content -LiteralPath $TargetFile -Value ($output -join [Environment]::NewLine) -Encoding utf8
@@ -417,6 +562,13 @@ function Main {
     Validate-Environment
     Write-Info "=== Updating agent context files for feature $CURRENT_BRANCH ==="
     if (-not (Parse-PlanData -PlanFile $NEW_PLAN)) { Write-Err 'Failed to parse plan data'; exit 1 }
+    
+    # Get project division and guides path
+    $script:PROJECT_DIVISION = Get-ProjectDivision -ProjectRoot $REPO_ROOT
+    $script:GUIDES_PATH = $REPO_ROOT
+    
+    Write-Info "Project division: $PROJECT_DIVISION"
+    
     $success = $true
     if ($AgentType) {
         Write-Info "Updating specific agent: $AgentType"

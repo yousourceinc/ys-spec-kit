@@ -8,16 +8,23 @@ This guide will help you get started with Spec-Driven Development using Spec Kit
 
 ### 1. Install Specify
 
-Initialize your project depending on the coding agent you're using:
+Initialize your project depending on the coding agent you're using. Choose your development division to get domain-specific implementation guidance:
 
 ```bash
-uvx --from git+https://github.com/github/spec-kit.git specify init <PROJECT_NAME>
+# Software Engineering (backend, APIs, web apps)
+uvx --from git+https://github.com/github/spec-kit.git specify init <PROJECT_NAME> --division SE
+
+# Data Science (ML, data pipelines, analytics)  
+uvx --from git+https://github.com/github/spec-kit.git specify init <PROJECT_NAME> --division DS
+
+# Platform Engineering (infrastructure, DevOps, cloud)
+uvx --from git+https://github.com/github/spec-kit.git specify init <PROJECT_NAME> --division Platform
 ```
 
 Pick script type explicitly (optional):
 ```bash
-uvx --from git+https://github.com/github/spec-kit.git specify init <PROJECT_NAME> --script ps  # Force PowerShell
-uvx --from git+https://github.com/github/spec-kit.git specify init <PROJECT_NAME> --script sh  # Force POSIX shell
+uvx --from git+https://github.com/github/spec-kit.git specify init <PROJECT_NAME> --division SE --script ps  # Force PowerShell
+uvx --from git+https://github.com/github/spec-kit.git specify init <PROJECT_NAME> --division SE --script sh  # Force POSIX shell
 ```
 
 ### 2. Create the Spec
@@ -54,6 +61,21 @@ specify guides show security/jwt-implementation
 # Keep guides up to date
 specify guides update
 ```
+
+## Division-Aware Development
+
+Specify CLI supports **division-aware workflows** that prioritize implementation guides based on your development focus area. When you specify a division during project initialization, guides are organized by priority:
+
+- **Primary Division**: Domain-specific guides for your focus area (e.g., SE gets backend/API patterns first)
+- **Common**: Cross-cutting guides applicable to all divisions (Git workflow, testing practices)
+- **Other Divisions**: Available as reference material
+
+Your AI agent automatically receives the most relevant guidance for your domain, ensuring faster and more accurate implementation.
+
+**Division Options:**
+- `SE`: Software Engineering (backend, APIs, web applications)
+- `DS`: Data Science (ML models, data pipelines, analytics)
+- `Platform`: Platform Engineering (infrastructure, DevOps, cloud architecture)
 
 ## Detailed Example: Building Taskify
 
@@ -131,11 +153,11 @@ For CI/CD pipelines and testing environments, you can override the implementatio
 ```bash
 # In your CI/CD pipeline or testing environment
 export SPECIFY_GUIDES_REPO_URL="git@github.com:your-org/test-guides.git"
-specify init my-test-project --ai claude
+specify init my-test-project --ai claude --division SE
 
 # Or use a staging guides repository for development
 export SPECIFY_GUIDES_REPO_URL="https://github.com/your-org/staging-guides.git"  
-specify init my-dev-project --ai copilot
+specify init my-dev-project --ai copilot --division DS
 ```
 
 **Common Override Scenarios:**
