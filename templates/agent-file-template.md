@@ -16,6 +16,9 @@ Auto-generated from all feature plans. Last updated: [DATE]
 ## Code Style
 [LANGUAGE-SPECIFIC, ONLY FOR LANGUAGES IN USE]
 
+## Guides
+[GUIDES SECTION]
+
 ## Recent Changes
 [LAST 3 FEATURES AND WHAT THEY ADDED]
 

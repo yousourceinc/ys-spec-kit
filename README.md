@@ -158,6 +158,49 @@ Want to see Spec Kit in action? Watch our [video overview](https://www.youtube.c
 | [Amazon Q Developer CLI](https://aws.amazon.com/developer/learning/q-developer-cli/) | ⚠️ | Amazon Q Developer CLI [does not support](https://github.com/aws/amazon-q-developer-cli/issues/3064) custom arguments for slash commands. |
 | [Codex CLI](https://github.com/openai/codex)              | ⚠️ | Codex [does not support](https://github.com/openai/codex/issues/2890) custom arguments for slash commands.  |
 
+## 🎯 Division-Aware Workflows
+
+Specify CLI supports **division-aware development workflows** that prioritize implementation guides based on your development focus area. This ensures AI agents receive the most relevant guidance for your specific domain.
+
+### Available Divisions
+
+| Division   | Focus Area | Description |
+|------------|------------|-------------|
+| **SE**     | Software Engineering | Backend development, APIs, web applications, system architecture |
+| **DS**     | Data Science | Data analysis, machine learning, statistical modeling, data pipelines |
+| **Platform**| Platform Engineering | Infrastructure, DevOps, cloud architecture, containerization |
+
+### How Division-Aware Workflows Work
+
+1. **Guide Prioritization**: When you specify a division during project initialization, guides are prioritized in this order:
+   - **Primary**: Guides specific to your division (e.g., SE division gets backend/API guides first)
+   - **Common**: Cross-cutting guides applicable to all divisions (e.g., Git workflow, testing)
+   - **Other**: Guides from other divisions (available as reference)
+
+2. **AI Context Updates**: Agent context files are automatically updated with division-specific guide references, ensuring your AI assistant has access to the most relevant implementation patterns.
+
+3. **Dynamic Updates**: As you work on features, the `update-agent-context.sh` script reads your project's division and refreshes guide priorities accordingly.
+
+### Division Examples
+
+```bash
+# Backend API development (Software Engineering focus)
+specify init api-service --ai claude --division SE
+
+# Data pipeline project (Data Science focus)
+specify init data-pipeline --ai copilot --division DS
+
+# Infrastructure automation (Platform focus)
+specify init infra-automation --ai cursor --division Platform
+```
+
+### Benefits
+
+- **Relevant Guidance**: AI agents receive domain-specific implementation patterns
+- **Faster Development**: Less time spent filtering irrelevant guides
+- **Consistent Practices**: Division-specific best practices are prioritized
+- **Team Alignment**: Different teams can focus on their domain expertise
+
 ## 🔐 GitHub OAuth Authentication
 
 Specify CLI can be configured with GitHub OAuth for team access control and secure distribution. This is especially useful for organizations that want to:
@@ -192,6 +235,7 @@ The `specify` command supports the following options:
 |------------------------|----------|------------------------------------------------------------------------------|
 | `<project-name>`       | Argument | Name for your new project directory (optional if using `--here`, or use `.` for current directory) |
 | `--ai`                 | Option   | AI assistant to use: `claude`, `gemini`, `copilot`, `cursor`, `qwen`, `opencode`, `codex`, `windsurf`, `kilocode`, `auggie`, `roo`, or `q` |
+| `--division`           | Option   | Development division for guide prioritization: `SE` (Software Engineering), `DS` (Data Science), or `Platform` |
 | `--script`             | Option   | Script variant to use: `sh` (bash/zsh) or `ps` (PowerShell)                 |
 | `--ignore-agent-tools` | Flag     | Skip checks for AI agent tools like Claude Code                             |
 | `--no-git`             | Flag     | Skip git repository initialization                                          |
@@ -209,6 +253,11 @@ specify init my-project
 
 # Initialize with specific AI assistant
 specify init my-project --ai claude
+
+# Initialize with division for guide prioritization
+specify init my-project --ai claude --division SE
+specify init my-project --ai copilot --division DS
+specify init my-project --ai cursor --division Platform
 
 # Initialize with Cursor support
 specify init my-project --ai cursor

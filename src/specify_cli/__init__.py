@@ -49,6 +49,9 @@ from typer.core import TyperGroup
 
 # For cross-platform keyboard input
 import readchar
+
+# Import config module
+from .config import write_project_config, validate_division, get_valid_divisions
 import ssl
 import truststore
 
@@ -864,6 +867,7 @@ def init(
     skip_tls: bool = typer.Option(False, "--skip-tls", help="Skip SSL/TLS verification (not recommended)"),
     debug: bool = typer.Option(False, "--debug", help="Show verbose diagnostic output for network and extraction failures"),
     github_token: str = typer.Option(None, "--github-token", help="GitHub token to use for API requests (or set GH_TOKEN or GITHUB_TOKEN environment variable)"),
+    division: str = typer.Option(None, "--division", help="Project division for AI guidance: SE, DS, Platform (defaults to SE)"),
 ):
     """
     Initialize a new Specify project from the latest template.
@@ -874,7 +878,8 @@ def init(
     3. Download the appropriate template from GitHub
     4. Extract the template to a new project directory or current directory
     5. Initialize a fresh git repository (if not --no-git and no existing repo)
-    6. Optionally set up AI assistant commands
+    6. Configure project division for AI guidance (defaults to SE)
+    7. Optionally set up AI assistant commands
     
     Examples:
         specify init my-project
@@ -888,6 +893,8 @@ def init(
         specify init my-project --ai windsurf
         specify init my-project --ai auggie
         specify init my-project --ai q
+        specify init my-project --division DS
+        specify init my-project --ai claude --division Platform
         specify init --ignore-agent-tools my-project
         specify init . --ai claude         # Initialize in current directory
         specify init .                     # Initialize in current directory (interactive AI selection)
@@ -903,6 +910,18 @@ def init(
     if project_name == ".":
         here = True
         project_name = None  # Clear project_name to use existing validation logic
+    
+    # Validate division early if provided
+    if division:
+        # We can't validate against guides yet since they haven't been cloned
+        # But we can do basic format validation
+        if not division or not isinstance(division, str):
+            console.print("[red]Error:[/red] Division must be a non-empty string")
+            raise typer.Exit(1)
+        if not division.replace("-", "").replace("_", "").isalnum():
+            console.print(f"[red]Error:[/red] Invalid division format: {division}")
+            console.print("[dim]Division must contain only letters, numbers, hyphens, and underscores[/dim]")
+            raise typer.Exit(1)
     
     # Validate arguments
     if here and project_name:
@@ -1072,6 +1091,7 @@ def init(
         ("cleanup", "Cleanup"),
         ("git", "Initialize git repository"),
         ("guides", "Clone implementation guides"),
+        ("division", "Configure project division"),
         ("final", "Finalize")
     ]:
         tracker.add(key, label)
@@ -1116,6 +1136,32 @@ def init(
                 if not clone_guides_as_submodule(project_path, guides_repo_url, tracker=tracker):
                     # Clone failed - this is a fatal error since guides are required
                     raise Exception(f"Failed to clone implementation guides from {guides_repo_url}")
+
+            # Division configuration step
+            if division:
+                tracker.start("division", "Configure project division")
+                # Validate division against available guides
+                is_valid, error_msg = validate_division(division, project_path)
+                if not is_valid:
+                    tracker.error("division", error_msg)
+                    raise Exception(f"Invalid division '{division}': {error_msg}")
+                
+                # Write division to project config
+                try:
+                    write_project_config(project_path, division)
+                    tracker.complete("division", f"set to {division}")
+                except Exception as e:
+                    tracker.error("division", f"failed to write config: {e}")
+                    raise Exception(f"Failed to configure division: {e}")
+            else:
+                # Default to SE division
+                tracker.start("division", "Configure project division")
+                try:
+                    write_project_config(project_path, "SE")
+                    tracker.complete("division", "set to SE (default)")
+                except Exception as e:
+                    tracker.error("division", f"failed to write config: {e}")
+                    raise Exception(f"Failed to configure default division: {e}")
 
             tracker.complete("final", "project ready")
         except Exception as e:

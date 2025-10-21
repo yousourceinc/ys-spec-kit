@@ -128,11 +128,11 @@ Done! Your project is ready.
 ### Initialize New Project
 
 ```bash
-# Basic usage
-specify init my-project --ai claude
+# Basic usage with division
+specify init my-project --ai claude --division SE
 
 # In current directory
-specify init . --ai claude
+specify init . --ai claude --division DS
 ```
 
 **Note**: Implementation guides (if configured) are automatically available after initialization. Use `specify guides` commands to manage them.
@@ -207,8 +207,8 @@ Complete workflow from start to deployment:
 # 1. Install Specify
 npm install -g @your-org/specify-cli
 
-# 2. Initialize project
-specify init photo-organizer --ai claude
+# 2. Initialize project with division
+specify init photo-organizer --ai claude --division SE
 
 # 3. Open in your AI agent (Claude, Copilot, etc.)
 cd photo-organizer
@@ -362,12 +362,12 @@ specify init <project>  # Prompts for auth if needed
 specify logout          # Clear authentication
 
 # Project Setup
-specify init my-project --ai claude
-specify init . --here --force
+specify init my-project --ai claude --division SE
+specify init . --here --force --division DS
 
 # Custom Implementation Guides (optional)
 export SPECIFY_GUIDES_REPO_URL="git@github.com:your-org/custom-guides.git"
-specify init my-project --ai claude  # Uses custom guides
+specify init my-project --ai claude --division Platform  # Uses custom guides
 
 # Tools Check
 specify check

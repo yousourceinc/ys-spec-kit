@@ -79,6 +79,8 @@ NEW_LANG=""
 NEW_FRAMEWORK=""
 NEW_DB=""
 NEW_PROJECT_TYPE=""
+PROJECT_DIVISION=""
+GUIDES_PATH=""
 
 #==============================================================================
 # Utility Functions
@@ -108,8 +110,78 @@ cleanup() {
     exit $exit_code
 }
 
-# Set up cleanup trap
-trap cleanup EXIT INT TERM
+get_project_division() {
+    local project_root="$1"
+    
+    # Use Python to read the config
+    python3 -c "
+import sys
+import json
+from pathlib import Path
+
+config_file = Path('$project_root') / '.specify' / 'project.json'
+try:
+    if config_file.exists():
+        with open(config_file, 'r') as f:
+            config = json.load(f)
+        print(config.get('division', 'SE'))
+    else:
+        print('SE')
+except Exception as e:
+    print('SE')
+"
+}
+
+get_prioritized_guides() {
+    local division="$1"
+    local guides_path="$2"
+    
+    # Use Python to get prioritized guides
+    python3 -c "
+import sys
+import json
+from pathlib import Path
+
+def list_guides(division, guides_path):
+    references_path = Path(guides_path) / 'context' / 'references'
+    result = {'primary': [], 'common': [], 'other': {}}
+    
+    if not references_path.exists():
+        return result
+    
+    try:
+        division_guides = {}
+        for item in references_path.iterdir():
+            if item.is_dir() and not item.name.startswith('.'):
+                guides = []
+                try:
+                    for guide_file in item.glob('*.md'):
+                        if guide_file.is_file():
+                            guides.append(str(guide_file.relative_to(guides_path)))
+                except OSError:
+                    pass
+                division_guides[item.name] = sorted(guides)
+        
+        result['primary'] = division_guides.get(division, [])
+        result['common'] = division_guides.get('Common', [])
+        
+        other_guides = {}
+        for div_name, guides in division_guides.items():
+            if div_name != division and div_name != 'Common':
+                other_guides[div_name] = guides
+        result['other'] = other_guides
+        
+        return result
+        
+    except OSError:
+        return result
+
+division = '$division'
+guides_path = '$guides_path'
+guides = list_guides(division, guides_path)
+print(json.dumps(guides))
+"
+}
 
 #==============================================================================
 # Validation Functions
@@ -324,6 +396,10 @@ create_new_agent_file() {
         recent_change="- $escaped_branch: Added"
     fi
 
+    # Get prioritized guides for new files
+    local guides_section
+    guides_section=$(add_prioritized_guides_content "$(get_prioritized_guides "$PROJECT_DIVISION" "$GUIDES_PATH")")
+
     local substitutions=(
         "s|\[PROJECT NAME\]|$project_name|"
         "s|\[DATE\]|$current_date|"
@@ -331,6 +407,7 @@ create_new_agent_file() {
         "s|\[ACTUAL STRUCTURE FROM PLANS\]|$project_structure|g"
         "s|\[ONLY COMMANDS FOR ACTIVE TECHNOLOGIES\]|$commands|"
         "s|\[LANGUAGE-SPECIFIC, ONLY FOR LANGUAGES IN USE\]|$language_conventions|"
+        "s|\[GUIDES SECTION\]|$guides_section|"
         "s|\[LAST 3 FEATURES AND WHAT THEY ADDED\]|$recent_change|"
     )
     
@@ -361,6 +438,10 @@ update_existing_agent_file() {
     
     log_info "Updating existing agent context file..."
     
+    # Get prioritized guides
+    local guides_json
+    guides_json=$(get_prioritized_guides "$PROJECT_DIVISION" "$GUIDES_PATH")
+    
     # Use a single temporary file for atomic update
     local temp_file
     temp_file=$(mktemp) || {
@@ -372,6 +453,7 @@ update_existing_agent_file() {
     local tech_stack=$(format_technology_stack "$NEW_LANG" "$NEW_FRAMEWORK")
     local new_tech_entries=()
     local new_change_entry=""
+    local guides_section_added=false
     
     # Prepare new technology entries
     if [[ -n "$tech_stack" ]] && ! grep -q "$tech_stack" "$target_file"; then
@@ -392,6 +474,7 @@ update_existing_agent_file() {
     # Process file line by line
     local in_tech_section=false
     local in_changes_section=false
+    local in_guides_section=false
     local tech_entries_added=false
     local changes_entries_added=false
     local existing_changes_count=0
@@ -418,6 +501,22 @@ update_existing_agent_file() {
                 tech_entries_added=true
             fi
             echo "$line" >> "$temp_file"
+            continue
+        fi
+        
+        # Handle Guides section
+        if [[ "$line" == "## Guides" ]]; then
+            echo "$line" >> "$temp_file"
+            in_guides_section=true
+            # Add prioritized guides
+            if [[ $guides_section_added == false ]]; then
+                add_prioritized_guides "$temp_file" "$guides_json"
+                guides_section_added=true
+            fi
+            continue
+        elif [[ $in_guides_section == true ]] && [[ "$line" =~ ^##[[:space:]] ]]; then
+            echo "$line" >> "$temp_file"
+            in_guides_section=false
             continue
         fi
         
@@ -455,6 +554,32 @@ update_existing_agent_file() {
     # Post-loop check: if we're still in the Active Technologies section and haven't added new entries
     if [[ $in_tech_section == true ]] && [[ $tech_entries_added == false ]] && [[ ${#new_tech_entries[@]} -gt 0 ]]; then
         printf '%s\n' "${new_tech_entries[@]}" >> "$temp_file"
+    fi
+    
+    # If no Guides section was found, add it before Recent Changes
+    if [[ $guides_section_added == false ]]; then
+        # Find where to insert the Guides section (before Recent Changes)
+        local temp_file2
+        temp_file2=$(mktemp) || {
+            log_error "Failed to create temporary file"
+            rm -f "$temp_file"
+            return 1
+        }
+        
+        local found_recent_changes=false
+        while IFS= read -r line || [[ -n "$line" ]]; do
+            if [[ "$line" == "## Recent Changes" ]] && [[ $found_recent_changes == false ]]; then
+                echo "## Guides" >> "$temp_file2"
+                add_prioritized_guides "$temp_file2" "$guides_json"
+                echo "" >> "$temp_file2"
+                echo "$line" >> "$temp_file2"
+                found_recent_changes=true
+            else
+                echo "$line" >> "$temp_file2"
+            fi
+        done < "$temp_file"
+        
+        mv "$temp_file2" "$temp_file"
     fi
     
     # Move temp file to target atomically
@@ -538,6 +663,125 @@ update_agent_file() {
     fi
     
     return 0
+}
+
+add_prioritized_guides() {
+    local output_file="$1"
+    local guides_json="$2"
+    
+    # Parse JSON and add guides in priority order
+    echo "**Division**: $PROJECT_DIVISION" >> "$output_file"
+    echo "" >> "$output_file"
+    
+    # Primary division guides
+    local primary_guides
+    primary_guides=$(echo "$guides_json" | python3 -c "
+import sys
+import json
+data = json.load(sys.stdin)
+for guide in data.get('primary', []):
+    print(f'- {guide}')
+")
+    
+    if [[ -n "$primary_guides" ]]; then
+        echo "**$PROJECT_DIVISION Division Guides**:" >> "$output_file"
+        echo "$primary_guides" >> "$output_file"
+        echo "" >> "$output_file"
+    fi
+    
+    # Common guides
+    local common_guides
+    common_guides=$(echo "$guides_json" | python3 -c "
+import sys
+import json
+data = json.load(sys.stdin)
+for guide in data.get('common', []):
+    print(f'- {guide}')
+")
+    
+    if [[ -n "$common_guides" ]]; then
+        echo "**Common Guides**:" >> "$output_file"
+        echo "$common_guides" >> "$output_file"
+        echo "" >> "$output_file"
+    fi
+    
+    # Other division guides
+    local other_divisions
+    other_divisions=$(echo "$guides_json" | python3 -c "
+import sys
+import json
+data = json.load(sys.stdin)
+for div, guides in data.get('other', {}).items():
+    if guides:
+        print(f'**{div} Division Guides**:')
+        for guide in guides:
+            print(f'- {guide}')
+        print('')
+")
+    
+    if [[ -n "$other_divisions" ]]; then
+        echo "$other_divisions" >> "$output_file"
+    fi
+}
+
+add_prioritized_guides_content() {
+    local guides_json="$1"
+    
+    # Parse JSON and format guides for template
+    local content=""
+    
+    # Division
+    content="${content}**Division**: $PROJECT_DIVISION\\n\\n"
+    
+    # Primary division guides
+    local primary_guides
+    primary_guides=$(echo "$guides_json" | python3 -c "
+import sys
+import json
+data = json.load(sys.stdin)
+for guide in data.get('primary', []):
+    print(f'- {guide}')
+")
+    
+    if [[ -n "$primary_guides" ]]; then
+        content="${content}**$PROJECT_DIVISION Division Guides**:\\n"
+        content="${content}$primary_guides\\n\\n"
+    fi
+    
+    # Common guides
+    local common_guides
+    common_guides=$(echo "$guides_json" | python3 -c "
+import sys
+import json
+data = json.load(sys.stdin)
+for guide in data.get('common', []):
+    print(f'- {guide}')
+")
+    
+    if [[ -n "$common_guides" ]]; then
+        content="${content}**Common Guides**:\\n"
+        content="${content}$common_guides\\n\\n"
+    fi
+    
+    # Other division guides
+    local other_divisions
+    other_divisions=$(echo "$guides_json" | python3 -c "
+import sys
+import json
+data = json.load(sys.stdin)
+for div, guides in data.get('other', {}).items():
+    if guides:
+        print(f'**{div} Division Guides**:')
+        for guide in guides:
+            print(f'- {guide}')
+        print('')
+")
+    
+    if [[ -n "$other_divisions" ]]; then
+        content="${content}$other_divisions"
+    fi
+    
+    echo "$content"
 }
 
 #==============================================================================
@@ -692,6 +936,12 @@ main() {
         log_error "Failed to parse plan data"
         exit 1
     fi
+    
+    # Get project division and guides path
+    PROJECT_DIVISION=$(get_project_division "$REPO_ROOT")
+    GUIDES_PATH="$REPO_ROOT"
+    
+    log_info "Project division: $PROJECT_DIVISION"
     
     # Process based on agent type argument
     local success=true

@@ -1,0 +1,35 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/yousourceinc/ys-spec-kit/schemas/project-config.json",
+  "title": "Specify Project Configuration",
+  "description": "Configuration file for Specify CLI projects (.specify/project.json)",
+  "type": "object",
+  "required": ["division"],
+  "properties": {
+    "division": {
+      "type": "string",
+      "description": "Project's designated division for AI guidance and guide prioritization",
+      "enum": ["SE", "DS", "Platform"],
+      "default": "SE",
+      "examples": ["SE", "DS", "Platform"]
+    }
+  },
+  "additionalProperties": true,
+  "examples": [
+    {
+      "division": "SE"
+    },
+    {
+      "division": "DS"
+    },
+    {
+      "division": "Platform"
+    }
+  ],
+  "definitions": {
+    "division_values": {
+      "description": "Valid division identifiers. This list may be extended by adding directories to context/references/ in the guides repository.",
+      "enum": ["SE", "DS", "Platform"]
+    }
+  }
+}
