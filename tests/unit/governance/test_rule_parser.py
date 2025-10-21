@@ -4,7 +4,7 @@ Unit tests for RuleParser.
 
 import pytest
 from pathlib import Path
-from specify_cli.governance.rules.parser import RuleParser
+from specify_cli.governance.rules.parser import RuleParser, RuleParseError
 
 
 def test_rule_parser_parse_frontmatter_valid():
@@ -42,7 +42,7 @@ def test_rule_parser_parse_frontmatter_no_frontmatter():
 
 
 def test_rule_parser_parse_frontmatter_malformed_yaml():
-    """Test parsing malformed YAML raises ValueError."""
+    """Test parsing malformed YAML raises RuleParseError."""
     content = """---
 title: "Test Guide
 invalid: yaml: syntax
@@ -51,12 +51,12 @@ invalid: yaml: syntax
 # Content
 """
     
-    with pytest.raises(ValueError, match="Malformed YAML"):
+    with pytest.raises(RuleParseError, match="Malformed YAML"):
         RuleParser.parse_frontmatter(content)
 
 
 def test_rule_parser_parse_frontmatter_not_dict():
-    """Test frontmatter that's not a dictionary raises ValueError."""
+    """Test frontmatter that's not a dictionary raises RuleParseError."""
     content = """---
 - item1
 - item2
@@ -65,7 +65,7 @@ def test_rule_parser_parse_frontmatter_not_dict():
 # Content
 """
     
-    with pytest.raises(ValueError, match="must be a YAML dictionary"):
+    with pytest.raises(RuleParseError, match="must be a YAML dictionary"):
         RuleParser.parse_frontmatter(content)
 
 
@@ -135,7 +135,7 @@ def test_rule_parser_extract_rules_file_not_found():
 
 
 def test_rule_parser_extract_rules_invalid_rules_type(tmp_path):
-    """Test extract_rules raises ValueError when rules is not a list."""
+    """Test extract_rules raises RuleParseError when rules is not a list."""
     guide_content = """---
 title: "Invalid Guide"
 rules: "not a list"
@@ -147,7 +147,7 @@ rules: "not a list"
     guide_file = tmp_path / "guide.md"
     guide_file.write_text(guide_content)
     
-    with pytest.raises(ValueError, match="must be a list"):
+    with pytest.raises(RuleParseError, match="expected list"):
         RuleParser.extract_rules(guide_file)
 
 
@@ -197,7 +197,7 @@ def test_rule_parser_validate_rule_structure_missing_id():
         'description': 'Test'
     }
     
-    with pytest.raises(ValueError, match="missing required field: 'id'"):
+    with pytest.raises(RuleParseError, match="'id'"):
         RuleParser.validate_rule_structure(rule, 'file_exists')
 
 
@@ -209,7 +209,7 @@ def test_rule_parser_validate_rule_structure_missing_description():
         'path': 'test.txt'
     }
     
-    with pytest.raises(ValueError, match="missing required field: 'description'"):
+    with pytest.raises(RuleParseError, match="'description'"):
         RuleParser.validate_rule_structure(rule, 'file_exists')
 
 
@@ -221,7 +221,7 @@ def test_rule_parser_validate_rule_structure_missing_type():
         'description': 'Test'
     }
     
-    with pytest.raises(ValueError, match="missing required field: 'type'"):
+    with pytest.raises(RuleParseError, match="'type'"):
         RuleParser.validate_rule_structure(rule, 'file_exists')
 
 
@@ -233,7 +233,7 @@ def test_rule_parser_validate_rule_structure_file_exists_missing_path():
         'description': 'Test'
     }
     
-    with pytest.raises(ValueError, match="missing required field: 'path'"):
+    with pytest.raises(RuleParseError, match="'path'"):
         RuleParser.validate_rule_structure(rule, 'file_exists')
 
 
@@ -246,7 +246,7 @@ def test_rule_parser_validate_rule_structure_dependency_missing_file():
         'description': 'Test'
     }
     
-    with pytest.raises(ValueError, match="missing required field: 'file'"):
+    with pytest.raises(RuleParseError, match="'file'"):
         RuleParser.validate_rule_structure(rule, 'dependency_present')
 
 
@@ -259,7 +259,7 @@ def test_rule_parser_validate_rule_structure_dependency_missing_package():
         'description': 'Test'
     }
     
-    with pytest.raises(ValueError, match="missing required field: 'package'"):
+    with pytest.raises(RuleParseError, match="'package'"):
         RuleParser.validate_rule_structure(rule, 'dependency_present')
 
 
@@ -272,7 +272,7 @@ def test_rule_parser_validate_rule_structure_text_missing_file():
         'description': 'Test'
     }
     
-    with pytest.raises(ValueError, match="missing required field: 'file'"):
+    with pytest.raises(RuleParseError, match="'file'"):
         RuleParser.validate_rule_structure(rule, 'text_includes')
 
 
@@ -285,5 +285,5 @@ def test_rule_parser_validate_rule_structure_text_missing_text():
         'description': 'Test'
     }
     
-    with pytest.raises(ValueError, match="missing required field: 'text'"):
+    with pytest.raises(RuleParseError, match="'text'"):
         RuleParser.validate_rule_structure(rule, 'text_includes')
