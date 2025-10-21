@@ -22,10 +22,10 @@
 
 **Purpose**: Project initialization and governance module structure
 
-- [ ] T001 Create governance module directory structure at src/specify_cli/governance/
-- [ ] T002 Create governance submodule __init__.py files (governance/, governance/rules/)
-- [ ] T003 [P] Add PyYAML dependency to pyproject.toml (if not present)
-- [ ] T004 [P] Create test directory structure: tests/unit/governance/, tests/integration/governance/, tests/fixtures/governance/
+- [x] T001 Create governance module directory structure at src/specify_cli/governance/
+- [x] T002 Create governance submodule __init__.py files (governance/, governance/rules/)
+- [x] T003 [P] Add PyYAML dependency to pyproject.toml (if not present)
+- [x] T004 [P] Create test directory structure: tests/unit/governance/, tests/integration/governance/, tests/fixtures/governance/
 
 ---
 
@@ -35,20 +35,20 @@
 
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete
 
-- [ ] T005 Implement BaseRule abstract class in src/specify_cli/governance/rules/__init__.py
-- [ ] T006 [P] Implement FileExistsRule class in src/specify_cli/governance/rules/file_rules.py
-- [ ] T007 [P] Implement DependencyPresentRule class in src/specify_cli/governance/rules/dependency_rules.py
-- [ ] T008 [P] Implement TextIncludesRule class in src/specify_cli/governance/rules/text_rules.py
-- [ ] T009 Implement RuleEngine class with rule registration and evaluation in src/specify_cli/governance/rules/engine.py
-- [ ] T010 Implement RuleParser class for YAML frontmatter extraction in src/specify_cli/governance/rules/parser.py
-- [ ] T011 Create unit tests for BaseRule in tests/unit/governance/test_base_rule.py
-- [ ] T012 [P] Create unit tests for FileExistsRule in tests/unit/governance/test_file_rules.py
-- [ ] T013 [P] Create unit tests for DependencyPresentRule in tests/unit/governance/test_dependency_rules.py
-- [ ] T014 [P] Create unit tests for TextIncludesRule in tests/unit/governance/test_text_rules.py
-- [ ] T015 Create unit tests for RuleEngine in tests/unit/governance/test_rule_engine.py
-- [ ] T016 Create unit tests for RuleParser in tests/unit/governance/test_rule_parser.py
-- [ ] T017 [P] Create test fixture: sample implementation guide with YAML rules in tests/fixtures/governance/sample_guide.md
-- [ ] T018 [P] Create test fixture: sample project structure for compliance testing in tests/fixtures/governance/sample_project/
+- [x] T005 Implement BaseRule abstract class in src/specify_cli/governance/rules/__init__.py
+- [x] T006 [P] Implement FileExistsRule class in src/specify_cli/governance/rules/file_rules.py
+- [x] T007 [P] Implement DependencyPresentRule class in src/specify_cli/governance/rules/dependency_rules.py
+- [x] T008 [P] Implement TextIncludesRule class in src/specify_cli/governance/rules/text_rules.py
+- [x] T009 Implement RuleEngine class with rule registration and evaluation in src/specify_cli/governance/rules/engine.py
+- [x] T010 Implement RuleParser class for YAML frontmatter extraction in src/specify_cli/governance/rules/parser.py
+- [x] T011 Create unit tests for BaseRule in tests/unit/governance/test_base_rule.py
+- [x] T012 [P] Create unit tests for FileExistsRule in tests/unit/governance/test_file_rules.py
+- [x] T013 [P] Create unit tests for DependencyPresentRule in tests/unit/governance/test_dependency_rules.py
+- [x] T014 [P] Create unit tests for TextIncludesRule in tests/unit/governance/test_text_rules.py
+- [x] T015 Create unit tests for RuleEngine in tests/unit/governance/test_rule_engine.py
+- [x] T016 Create unit tests for RuleParser in tests/unit/governance/test_rule_parser.py
+- [x] T017 [P] Create test fixture: sample implementation guide with YAML rules in tests/fixtures/governance/sample_guide.md
+- [x] T018 [P] Create test fixture: sample project structure for compliance testing in tests/fixtures/governance/sample_project/
 
 **Checkpoint**: Rule engine foundation complete - user story implementation can now begin in parallel
 
