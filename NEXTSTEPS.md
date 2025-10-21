@@ -99,6 +99,167 @@ specify init my-project --ai claude  # Guides configured automatically
 
 ---
 
+## v0.4.1: Governance & Compliance Layer (HIGH PRIORITY)
+
+### Feature: Implementation Guide Compliance Checking
+
+**Status**: 📋 SPECIFICATION COMPLETE (v0.4.1)  
+**Related Spec**: `specs/003-governance-compliance-layer/`
+
+Implement a comprehensive compliance framework that extracts rules from implementation guides and validates project implementations against those rules.
+
+#### Architecture Overview
+
+**Three-Layer Design**:
+
+1. **Rule Definition Layer** (YAML in Guide Files)
+   - Rules defined in YAML frontmatter of implementation guides
+   - Three rule types: `file_exists`, `dependency_present`, `text_includes`
+   - Each rule has: `id`, `type`, `description`, and type-specific fields
+
+2. **Rule Engine Layer** (Python Classes)
+   - `BaseRule` - Abstract base class for all rule types
+   - Rule-specific classes: `FileExistsRule`, `DependencyPresentRule`, `TextIncludesRule`
+   - `RuleEngine` - Orchestrates rule evaluation
+   - `RuleParser` - Extracts YAML frontmatter from guides
+
+3. **Compliance Check Layer** (CLI Command)
+   - `specify compliance check` - Evaluate project against rules
+   - `specify compliance report` - Generate compliance report
+   - Support for rule waiving with justification
+   - Clear pass/fail/error status reporting
+
+#### Implementation Status
+
+**✅ Phase 1 Complete** (October 2025):
+
+1. **Project Configuration Schema** (`specs/003-governance-compliance-layer/contracts/project-config-schema.json`)
+   - ✅ Created JSON Schema for `.specify/project.json`
+   - ✅ Defined compliance waiver structure
+   - ✅ Included rule reference mechanism
+
+2. **Shell Script API Contract** (`specs/003-governance-compliance-layer/contracts/shell-script-api.md`)
+   - ✅ Defined `--rules-dir` parameter for guide rules discovery
+   - ✅ Specified rule discovery algorithm
+   - ✅ Defined exit codes and output format
+   - ✅ Created example script implementations
+
+3. **Python Config API Contract** (`specs/003-governance-compliance-layer/contracts/python-config-api.md`)
+   - ✅ Defined `SpecifyConfig` class interface
+   - ✅ Specified waiver management methods
+   - ✅ Defined rule querying interface
+   - ✅ Included configuration file handling
+
+4. **Rule Engine API Contract** (`specs/003-governance-compliance-layer/contracts/rule-engine-api.md`)
+   - ✅ Defined YAML rule format with examples
+   - ✅ Created `BaseRule` and rule-specific classes
+   - ✅ Defined `RuleEngine` orchestration interface
+   - ✅ Created `RuleParser` for YAML extraction
+   - ✅ Specified error handling and testing strategies
+
+#### Rule Type Specifications
+
+**file_exists** - Verify required files exist
+```yaml
+- id: api-routes-defined
+  type: file_exists
+  path: "src/api/routes.py"
+  description: "API routes module must exist"
+```
+
+**dependency_present** - Check manifest for dependencies
+```yaml
+- id: fastapi-required
+  type: dependency_present
+  file: "requirements.txt"
+  package: "fastapi"
+  version: ">=0.95"
+  description: "FastAPI version 0.95+ required"
+```
+
+**text_includes** - Find text patterns in files
+```yaml
+- id: router-decorator-used
+  type: text_includes
+  file: "src/api/routes.py"
+  text: "@router.get"
+  description: "Must use FastAPI router decorators"
+```
+
+#### Planned Implementation (v0.4.1)
+
+**Phase 2 - Python Implementation**:
+1. Implement rule classes in `src/specify_cli/governance/rules/`
+2. Create `RuleEngine` orchestration in `src/specify_cli/governance/engine.py`
+3. Implement `RuleParser` for YAML extraction
+4. Add `specify compliance` CLI commands
+5. Implement rule waiving with audit trail
+6. Comprehensive error handling (parse errors, evaluation errors)
+
+**Phase 3 - Integration & Testing**:
+1. Unit tests for each rule type (15+ tests)
+2. Integration tests for rule parsing and engine
+3. E2E tests for CLI commands
+4. Performance validation (<30 second compliance check)
+5. Documentation and examples
+
+#### Example Usage (Post-Implementation)
+
+```bash
+# Check project compliance against all rules in guides
+specify compliance check
+
+# Generate compliance report
+specify compliance report
+
+# Waive specific rule with justification
+specify compliance waive api-routes-defined "Using GraphQL instead"
+
+# View waived rules
+specify compliance waivers list
+```
+
+#### Guide Author Integration Example
+
+```markdown
+---
+title: "Backend API Implementation"
+division: "SE"
+rules:
+  - id: api-routes-defined
+    type: file_exists
+    path: "src/api/routes.py"
+    description: "API routes module must exist"
+  
+  - id: tests-present
+    type: file_exists
+    path: "tests/api/test_routes.py"
+    description: "API tests must exist"
+  
+  - id: fastapi-required
+    type: dependency_present
+    file: "requirements.txt"
+    package: "fastapi"
+    version: ">=0.95"
+---
+
+# Backend API Implementation Guide
+
+Use FastAPI router pattern for API endpoints...
+```
+
+#### Performance Requirements
+
+- Single compliance check: <30 seconds (from spec)
+- Rule evaluation time per type:
+  - `file_exists`: ~1ms per rule
+  - `dependency_present`: ~10-100ms per rule
+  - `text_includes`: ~5-50ms per rule
+- Typical project (10-20 rules): <1 second
+- Large project (50+ rules): <10 seconds
+
+---
+
 ## v0.5.0: AI Model Selection (MEDIUM PRIORITY)
 
 ### Feature: Enable GPT-5 mini for Clients
