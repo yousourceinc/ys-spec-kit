@@ -68,7 +68,7 @@ specify check
 Install once and use everywhere:
 
 ```bash
-uv tool install specify-cli --from git+https://github.com/yousourcephinc/ys-spec-kit.git
+    uv tool install specify-cli --from git+https://github.com/yousourcephinc/ys-spec-kit.git
 ```
 
 Then use the tool directly:

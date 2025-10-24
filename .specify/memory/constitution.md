@@ -1,63 +1,50 @@
-
-<!--
-Sync Impact Report
-Version change: 1.0.0 → 1.1.0
-List of modified principles: Added VI. Developer-Centric Experience
-Added sections: Principle VI
-Removed sections: None
-Templates requiring updates: ✅ .specify/templates/plan-template.md, ✅ .specify/templates/spec-template.md, ✅ .specify/templates/tasks-template.md
-Follow-up TODOs: TODO(RATIFICATION_DATE): Original adoption date not known, assumed 2025-10-20
-
-# YS Spec Kit Constitution
-
+# [PROJECT_NAME] Constitution
+<!-- Example: Spec Constitution, TaskFlow Constitution, etc. -->
 
 ## Core Principles
 
+### [PRINCIPLE_1_NAME]
+<!-- Example: I. Library-First -->
+[PRINCIPLE_1_DESCRIPTION]
+<!-- Example: Every feature starts as a standalone library; Libraries must be self-contained, independently testable, documented; Clear purpose required - no organizational-only libraries -->
 
-### I. Specification-First
-Every feature and change begins with a written specification. Specifications MUST be explicit, testable, and reviewed before implementation. No code is written until the spec is approved.
+### [PRINCIPLE_2_NAME]
+<!-- Example: II. CLI Interface -->
+[PRINCIPLE_2_DESCRIPTION]
+<!-- Example: Every library exposes functionality via CLI; Text in/out protocol: stdin/args → stdout, errors → stderr; Support JSON + human-readable formats -->
 
-### II. Test-Driven Implementation
-All code MUST be developed using TDD. Tests are written and approved before implementation. Red-Green-Refactor is strictly enforced. No feature is complete without passing tests.
+### [PRINCIPLE_3_NAME]
+<!-- Example: III. Test-First (NON-NEGOTIABLE) -->
+[PRINCIPLE_3_DESCRIPTION]
+<!-- Example: TDD mandatory: Tests written → User approved → Tests fail → Then implement; Red-Green-Refactor cycle strictly enforced -->
 
-### III. CLI and Automation Focus
-All libraries and features MUST expose a CLI interface. Input/output is text-based (stdin/stdout), supporting both human-readable and JSON formats. Automation and scripting are first-class citizens.
+### [PRINCIPLE_4_NAME]
+<!-- Example: IV. Integration Testing -->
+[PRINCIPLE_4_DESCRIPTION]
+<!-- Example: Focus areas requiring integration tests: New library contract tests, Contract changes, Inter-service communication, Shared schemas -->
 
-### IV. Integration and Contract Testing
-Integration tests are required for all new contracts, inter-service communication, and shared schemas. Contract changes MUST be accompanied by updated tests and migration plans.
+### [PRINCIPLE_5_NAME]
+<!-- Example: V. Observability, VI. Versioning & Breaking Changes, VII. Simplicity -->
+[PRINCIPLE_5_DESCRIPTION]
+<!-- Example: Text I/O ensures debuggability; Structured logging required; Or: MAJOR.MINOR.BUILD format; Or: Start simple, YAGNI principles -->
 
+## [SECTION_2_NAME]
+<!-- Example: Additional Constraints, Security Requirements, Performance Standards, etc. -->
 
-### V. Observability and Simplicity
-All systems MUST provide structured logging and clear error reporting. Simplicity is prioritized: avoid over-engineering, follow YAGNI, and document rationale for complexity.
+[SECTION_2_CONTENT]
+<!-- Example: Technology stack requirements, compliance standards, deployment policies, etc. -->
 
-### VI. Developer-Centric Experience
-All interfaces, particularly the CLI, MUST be designed for clarity and ease of use. Commands should be intuitive, documentation (via --help flags and READMEs) must be comprehensive, and error messages must be user-friendly and actionable. The primary goal is to empower the developer and streamline their workflow, not to add friction.
+## [SECTION_3_NAME]
+<!-- Example: Development Workflow, Review Process, Quality Gates, etc. -->
 
-
-
-## Additional Constraints
-
-- All code MUST be compatible with Linux/macOS and support WSL2 on Windows.
-- Only open-source dependencies with OSI-approved licenses are permitted unless explicitly justified and approved.
-- All persistent data MUST be encrypted at rest and in transit.
-- Security reviews are required for all external integrations.
-
-
-## Development Workflow
-
-- All changes require code review by at least one other team member.
-- CI/CD pipelines MUST run all tests and linters before merge.
-- No direct commits to main; all changes via pull request.
-- Feature branches MUST be named after the spec/feature (e.g., `001-photo-albums`).
-- All specs, plans, and tasks MUST be kept in sync with the constitution.
-
+[SECTION_3_CONTENT]
+<!-- Example: Code review requirements, testing gates, deployment approval process, etc. -->
 
 ## Governance
+<!-- Example: Constitution supersedes all other practices; Amendments require documentation, approval, migration plan -->
 
-- This constitution supersedes all other development practices in the project.
-- Amendments require a documented proposal, team review, and explicit version bump.
-- All PRs and reviews MUST verify compliance with the constitution and document any exceptions.
-- Versioning follows semantic rules: MAJOR for breaking/removal, MINOR for new principles/sections, PATCH for clarifications.
-- Compliance reviews are required quarterly or after any MAJOR/MINOR version bump.
+[GOVERNANCE_RULES]
+<!-- Example: All PRs/reviews must verify compliance; Complexity must be justified; Use [GUIDANCE_FILE] for runtime development guidance -->
 
-**Version**: 1.1.0 | **Ratified**: TODO(RATIFICATION_DATE): Original adoption date not known, assumed 2025-10-20 | **Last Amended**: 2025-10-20
+**Version**: [CONSTITUTION_VERSION] | **Ratified**: [RATIFICATION_DATE] | **Last Amended**: [LAST_AMENDED_DATE]
+<!-- Example: Version: 2.1.1 | Ratified: 2025-06-13 | Last Amended: 2025-07-16 -->
