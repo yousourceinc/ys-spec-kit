@@ -1,0 +1,3 @@
+[submodule "context/references"]
+	path = context/references
+	url = git@github.com:yousourcephinc/ys-requirements-list.git
