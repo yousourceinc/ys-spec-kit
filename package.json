@@ -1,6 +1,6 @@
 {
   "name": "@yousourcephinc/specify-cli",
-  "version": "0.4.1",
+  "version": "0.4.2",
   "description": "YourSource Specify CLI",
   "main": "bin/specify.js",
   "bin": {
