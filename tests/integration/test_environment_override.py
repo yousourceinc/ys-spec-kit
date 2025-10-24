@@ -12,7 +12,8 @@ from pathlib import Path
 from unittest.mock import Mock, patch
 import pytest
 
-from specify_cli import clone_guides_as_submodule, StepTracker
+from specify_cli.core.git import clone_guides_as_submodule
+from specify_cli.ui.tracker import StepTracker
 
 
 class TestEnvironmentVariableOverrideIntegration:
@@ -59,7 +60,7 @@ class TestEnvironmentVariableOverrideIntegration:
             # Simulate the environment variable override logic from init() function
             guides_repo_url = os.getenv("SPECIFY_GUIDES_REPO_URL", "").strip()
             if not guides_repo_url:
-                from specify_cli import GUIDES_REPO_URL
+                from specify_cli.core.constants import GUIDES_REPO_URL
                 guides_repo_url = GUIDES_REPO_URL
 
             # Act: Call clone_guides_as_submodule with override URL
@@ -156,7 +157,7 @@ class TestEnvironmentVariableOverrideIntegration:
 
             # Assert
             assert result is True
-            from specify_cli import GUIDES_REPO_URL
+            from specify_cli.core.constants import GUIDES_REPO_URL
             assert guides_repo_url == GUIDES_REPO_URL  # Should fall back to hardcoded constant
 
             # Verify git submodule add was called with hardcoded URL

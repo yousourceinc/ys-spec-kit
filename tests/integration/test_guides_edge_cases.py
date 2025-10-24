@@ -11,7 +11,7 @@ from pathlib import Path
 from unittest.mock import Mock, patch
 import pytest
 
-from specify_cli import clone_guides_as_submodule
+from specify_cli.core.git import clone_guides_as_submodule
 
 
 class TestGuidesEdgeCases:
@@ -30,8 +30,8 @@ class TestGuidesEdgeCases:
         subprocess.run(["git", "config", "user.email", "test@example.com"], cwd=temp_project, check=True)
         subprocess.run(["git", "config", "user.name", "Test User"], cwd=temp_project, check=True)
 
-        # Act: Attempt to clone with empty URL
-        from specify_cli import StepTracker
+                                        # Act: Attempt to clone with network error
+        from specify_cli.ui.tracker import StepTracker
         tracker = StepTracker("Test")
         result = clone_guides_as_submodule(temp_project, "", tracker)
 
@@ -47,7 +47,7 @@ class TestGuidesEdgeCases:
         subprocess.run(["git", "config", "user.name", "Test User"], cwd=temp_project, check=True)
 
         # Act: Attempt to clone with whitespace URL
-        from specify_cli import StepTracker
+        from specify_cli.ui.tracker import StepTracker
         tracker = StepTracker("Test")
         result = clone_guides_as_submodule(temp_project, "   ", tracker)
 
@@ -71,7 +71,7 @@ class TestGuidesEdgeCases:
             mock_subprocess_run.return_value = mock_result
 
             # Act: Attempt to clone with malformed URL
-            from specify_cli import StepTracker
+            from specify_cli.ui.tracker import StepTracker
             tracker = StepTracker("Test")
             result = clone_guides_as_submodule(temp_project, "not-a-url", tracker)
 
@@ -95,7 +95,7 @@ class TestGuidesEdgeCases:
             )
 
             # Act: Attempt to clone (should timeout)
-            from specify_cli import StepTracker
+            from specify_cli.ui.tracker import StepTracker
             tracker = StepTracker("Test")
             result = clone_guides_as_submodule(temp_project, "https://github.com/test/repo.git", tracker)
 
@@ -119,7 +119,7 @@ class TestGuidesEdgeCases:
             mock_subprocess_run.return_value = mock_result
 
             # Act: Attempt to clone
-            from specify_cli import StepTracker
+            from specify_cli.ui.tracker import StepTracker
             tracker = StepTracker("Test")
             result = clone_guides_as_submodule(temp_project, "https://github.com/test/repo.git", tracker)
 
@@ -143,7 +143,7 @@ class TestGuidesEdgeCases:
             mock_subprocess_run.return_value = mock_result
 
             # Act: Attempt to clone
-            from specify_cli import StepTracker
+            from specify_cli.ui.tracker import StepTracker
             tracker = StepTracker("Test")
             result = clone_guides_as_submodule(temp_project, "https://github.com/test/repo.git", tracker)
 
@@ -167,7 +167,7 @@ class TestGuidesEdgeCases:
             mock_subprocess_run.return_value = mock_result
 
             # Act: Attempt to clone
-            from specify_cli import StepTracker
+            from specify_cli.ui.tracker import StepTracker
             tracker = StepTracker("Test")
             result = clone_guides_as_submodule(temp_project, "https://github.com/test/corrupt-repo.git", tracker)
 
@@ -191,7 +191,7 @@ class TestGuidesEdgeCases:
             mock_subprocess_run.return_value = mock_result
 
             # Act: Attempt to clone
-            from specify_cli import StepTracker
+            from specify_cli.ui.tracker import StepTracker
             tracker = StepTracker("Test")
             result = clone_guides_as_submodule(temp_project, "https://github.com/test/repo.git", tracker)
 
@@ -215,7 +215,7 @@ class TestGuidesEdgeCases:
             mock_subprocess_run.return_value = mock_result
 
             # Act: Attempt to clone private repo
-            from specify_cli import StepTracker
+            from specify_cli.ui.tracker import StepTracker
             tracker = StepTracker("Test")
             result = clone_guides_as_submodule(temp_project, "https://github.com/private/repo.git", tracker)
 
@@ -245,7 +245,7 @@ class TestGuidesEdgeCases:
             mock_subprocess_run.side_effect = [add_result, update_result]
 
             # Act: Attempt to clone large repo
-            from specify_cli import StepTracker
+            from specify_cli.ui.tracker import StepTracker
             tracker = StepTracker("Test")
             result = clone_guides_as_submodule(temp_project, "https://github.com/test/large-repo.git", tracker)
 

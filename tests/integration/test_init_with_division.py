@@ -8,7 +8,10 @@ import pytest
 import tempfile
 import time
 from pathlib import Path
-from unittest.mock import patch
+from unittest.mock import patch, Mock
+from typer.testing import CliRunner
+
+from specify_cli import app
 
 
 class TestInitWithDivision:
@@ -22,29 +25,40 @@ class TestInitWithDivision:
         project_path = tmp_path / project_name
         
         # Mock the download_and_extract_template to avoid network calls
-        with patch('specify_cli.__init__.download_and_extract_template') as mock_download, \
-             patch('specify_cli.__init__.ensure_executable_scripts'), \
-             patch('specify_cli.__init__.is_git_repo', return_value=True), \
-             patch('specify_cli.__init__.init_git_repo', return_value=True), \
-             patch('specify_cli.__init__.clone_guides_as_submodule', return_value=True), \
-             patch('specify_cli.__init__.check_tool', return_value=True):
+        with patch('specify_cli.commands.init.download_and_extract_template') as mock_download, \
+             patch('specify_cli.commands.init.ensure_executable_scripts'), \
+             patch('specify_cli.commands.init.is_git_repo', return_value=True), \
+             patch('specify_cli.commands.init.init_git_repo', return_value=True), \
+             patch('specify_cli.commands.init.clone_guides_as_submodule', return_value=True), \
+             patch('specify_cli.commands.init.check_tool', return_value=True):
             
             # Configure mock to create the expected directory structure
             def mock_download_func(*args, **kwargs):
                 project_path.mkdir(parents=True)
                 (project_path / "context").mkdir()
+                return project_path
             
             mock_download.side_effect = mock_download_func
             
-            # Run init command
-            result = subprocess.run([
-                "specify", "init", 
-                "--division", "DS", "--ai", "copilot", "--no-git",
-                project_name
-            ], cwd=tmp_path, capture_output=True, text=True, input='y\n')
-            
-            # Should succeed
-            assert result.returncode == 0
+            # Change to temp directory
+            import os
+            original_cwd = os.getcwd()
+            try:
+                os.chdir(tmp_path)
+                
+                # Run init command using CliRunner
+                runner = CliRunner()
+                result = runner.invoke(app, [
+                    "init", project_name,
+                    "--division", "DS", 
+                    "--ai", "copilot", 
+                    "--no-git"
+                ])
+                
+                # Should succeed
+                assert result.exit_code == 0
+            finally:
+                os.chdir(original_cwd)
             
             # Check that .specify/project.json was created with correct division
             config_file = project_path / ".specify" / "project.json"
@@ -63,29 +77,39 @@ class TestInitWithDivision:
         project_path = tmp_path / project_name
         
         # Mock the download_and_extract_template to avoid network calls
-        with patch('specify_cli.__init__.download_and_extract_template') as mock_download, \
-             patch('specify_cli.__init__.ensure_executable_scripts'), \
-             patch('specify_cli.__init__.is_git_repo', return_value=True), \
-             patch('specify_cli.__init__.init_git_repo', return_value=True), \
-             patch('specify_cli.__init__.clone_guides_as_submodule', return_value=True), \
-             patch('specify_cli.__init__.check_tool', return_value=True):
+        with patch('specify_cli.commands.init.download_and_extract_template') as mock_download, \
+             patch('specify_cli.commands.init.ensure_executable_scripts'), \
+             patch('specify_cli.commands.init.is_git_repo', return_value=True), \
+             patch('specify_cli.commands.init.init_git_repo', return_value=True), \
+             patch('specify_cli.commands.init.clone_guides_as_submodule', return_value=True), \
+             patch('specify_cli.commands.init.check_tool', return_value=True):
             
             # Configure mock to create the expected directory structure
             def mock_download_func(*args, **kwargs):
                 project_path.mkdir(parents=True)
                 (project_path / "context").mkdir()
+                return project_path
             
             mock_download.side_effect = mock_download_func
             
-            # Run init command without --division
-            result = subprocess.run([
-                "specify", "init", 
-                "--ai", "copilot", "--no-git",
-                project_name
-            ], cwd=tmp_path, capture_output=True, text=True, input='y\n')
-            
-            # Should succeed
-            assert result.returncode == 0
+            # Change to temp directory
+            import os
+            original_cwd = os.getcwd()
+            try:
+                os.chdir(tmp_path)
+                
+                # Run init command without --division using CliRunner
+                runner = CliRunner()
+                result = runner.invoke(app, [
+                    "init", project_name,
+                    "--ai", "copilot", 
+                    "--no-git"
+                ])
+                
+                # Should succeed
+                assert result.exit_code == 0
+            finally:
+                os.chdir(original_cwd)
             
             # Check that .specify/project.json was created with SE division
             config_file = project_path / ".specify" / "project.json"
@@ -104,30 +128,41 @@ class TestInitWithDivision:
         project_path = tmp_path / project_name
         
         # Mock the download_and_extract_template to avoid network calls
-        with patch('specify_cli.__init__.download_and_extract_template') as mock_download, \
-             patch('specify_cli.__init__.ensure_executable_scripts'), \
-             patch('specify_cli.__init__.is_git_repo', return_value=True), \
-             patch('specify_cli.__init__.init_git_repo', return_value=True), \
-             patch('specify_cli.__init__.clone_guides_as_submodule', return_value=True), \
-             patch('specify_cli.__init__.check_tool', return_value=True):
+        with patch('specify_cli.commands.init.download_and_extract_template') as mock_download, \
+             patch('specify_cli.commands.init.ensure_executable_scripts'), \
+             patch('specify_cli.commands.init.is_git_repo', return_value=True), \
+             patch('specify_cli.commands.init.init_git_repo', return_value=True), \
+             patch('specify_cli.commands.init.clone_guides_as_submodule', return_value=True), \
+             patch('specify_cli.commands.init.check_tool', return_value=True):
             
             # Configure mock to create the expected directory structure
             def mock_download_func(*args, **kwargs):
                 project_path.mkdir(parents=True)
                 (project_path / "context").mkdir()
+                return project_path
             
             mock_download.side_effect = mock_download_func
             
-            # Run init command with invalid division
-            result = subprocess.run([
-                "specify", "init", 
-                "--ai", "copilot", "--division", "INVALID", "--no-git",
-                project_name
-            ], cwd=tmp_path, capture_output=True, text=True, input='y\n')
-            
-            # Should fail with error message
-            assert result.returncode != 0
-            assert "Invalid division" in result.stderr or "Invalid division" in result.stdout
+            # Change to temp directory
+            import os
+            original_cwd = os.getcwd()
+            try:
+                os.chdir(tmp_path)
+                
+                # Run init command with invalid division using CliRunner
+                runner = CliRunner()
+                result = runner.invoke(app, [
+                    "init", project_name,
+                    "--ai", "copilot", 
+                    "--division", "INVALID", 
+                    "--no-git"
+                ])
+                
+                # Should fail with error message
+                assert result.exit_code != 0
+                assert "Invalid division" in result.output
+            finally:
+                os.chdir(original_cwd)
     
     def test_init_here_option_with_division(self, tmp_path):
         """Test specify init --here with division parameter."""
@@ -141,32 +176,45 @@ class TestInitWithDivision:
         (project_path / "context").mkdir()
         
         # Mock the download_and_extract_template to avoid network calls
-        with patch('specify_cli.__init__.download_and_extract_template') as mock_download, \
-             patch('specify_cli.__init__.ensure_executable_scripts'), \
-             patch('specify_cli.__init__.is_git_repo', return_value=True), \
-             patch('specify_cli.__init__.init_git_repo', return_value=True), \
-             patch('specify_cli.__init__.clone_guides_as_submodule', return_value=True), \
-             patch('specify_cli.__init__.check_tool', return_value=True):
+        with patch('specify_cli.commands.init.download_and_extract_template') as mock_download, \
+             patch('specify_cli.commands.init.ensure_executable_scripts'), \
+             patch('specify_cli.commands.init.is_git_repo', return_value=True), \
+             patch('specify_cli.commands.init.init_git_repo', return_value=True), \
+             patch('specify_cli.commands.init.clone_guides_as_submodule', return_value=True), \
+             patch('specify_cli.commands.init.check_tool', return_value=True):
             
             # Configure mock to create the expected directory structure
             def mock_download_func(*args, **kwargs):
                 # For --here, the template is extracted into the current directory
-                pass  # Directory already exists
+                return project_path
             
             mock_download.side_effect = mock_download_func
             
-            # Run init command with --here and division
-            result = subprocess.run([
-                "specify", "init", 
-                "--ai", "copilot", "--division", "Platform", "--here", "--no-git"
-            ], cwd=project_path, capture_output=True, text=True, input='y\n')
-            
-            # Should succeed
-            assert result.returncode == 0
-            
-            # Check that .specify/project.json was created with Platform division
-            config_file = project_path / ".specify" / "project.json"
-            assert config_file.exists()
+            # Change to project directory for --here
+            import os
+            original_cwd = os.getcwd()
+            try:
+                os.chdir(project_path)
+                
+                # Run init command with --here and division using CliRunner
+                runner = CliRunner()
+                result = runner.invoke(app, [
+                    "init", 
+                    "--ai", "copilot", 
+                    "--division", "Platform", 
+                    "--here", 
+                    "--no-git",
+                    "--force"  # Skip confirmation
+                ])
+                
+                # Should succeed
+                assert result.exit_code == 0
+                
+                # Check that .specify/project.json was created with Platform division
+                config_file = project_path / ".specify" / "project.json"
+                assert config_file.exists()
+            finally:
+                os.chdir(original_cwd)
             
             with open(config_file, 'r') as f:
                 config = json.load(f)

@@ -1,10 +1,10 @@
 {
-  "name": "@yousourceinc/specify-cli-fork",
-  "version": "0.4.1-fork.1",
+  "name": "@yousourcephinc/specify-cli",
+  "version": "0.4.1",
   "description": "YourSource Specify CLI",
   "main": "bin/specify.js",
   "bin": {
-    "specify": "./bin/specify.js"
+    "specify": "bin/specify.js"
   },
   "scripts": {
     "postinstall": "node scripts/install-python-cli.js",
@@ -24,11 +24,10 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/yousourceinc/ys-spec-kit.git"
+    "url": "git+https://github.com/yousourcephinc/ys-spec-kit.git"
   },
   "publishConfig": {
-    "access": "restricted",
-    "registry": "https://registry.npmjs.org"
+    "registry": "https://npm.pkg.github.com"
   },
   "author": "YourSource",
   "license": "Apache-2.0",

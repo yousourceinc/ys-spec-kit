@@ -11,7 +11,8 @@ from pathlib import Path
 from unittest.mock import Mock, patch, MagicMock
 import pytest
 
-from specify_cli import clone_guides_as_submodule, StepTracker
+from specify_cli.core.git import clone_guides_as_submodule
+from specify_cli.ui.tracker import StepTracker
 
 
 class TestCloneGuidesAsSubmodule:
@@ -355,7 +356,7 @@ class TestEnvironmentVariableOverride:
         mock_getenv.return_value = override_url
         
         # Import after mocking to ensure override is captured
-        from specify_cli import GUIDES_REPO_URL
+        from specify_cli.core.constants import GUIDES_REPO_URL
         
         # Act - simulate the override logic from init() function
         guides_repo_url = os.getenv("SPECIFY_GUIDES_REPO_URL", "").strip() or GUIDES_REPO_URL
@@ -371,7 +372,7 @@ class TestEnvironmentVariableOverride:
         # Arrange
         mock_getenv.return_value = ""  # Environment variable not set
         
-        from specify_cli import GUIDES_REPO_URL
+        from specify_cli.core.constants import GUIDES_REPO_URL
         
         # Act - simulate the override logic from init() function
         guides_repo_url = os.getenv("SPECIFY_GUIDES_REPO_URL", "").strip() or GUIDES_REPO_URL
@@ -386,7 +387,7 @@ class TestEnvironmentVariableOverride:
         # Arrange
         mock_getenv.return_value = ""  # Empty string
         
-        from specify_cli import GUIDES_REPO_URL
+        from specify_cli.core.constants import GUIDES_REPO_URL
         
         # Act - simulate the override logic from init() function
         guides_repo_url = os.getenv("SPECIFY_GUIDES_REPO_URL", "").strip() or GUIDES_REPO_URL
@@ -401,7 +402,7 @@ class TestEnvironmentVariableOverride:
         # Arrange
         mock_getenv.return_value = "   \t\n   "  # Whitespace only
         
-        from specify_cli import GUIDES_REPO_URL
+        from specify_cli.core.constants import GUIDES_REPO_URL
         
         # Act - simulate the override logic from init() function
         guides_repo_url = os.getenv("SPECIFY_GUIDES_REPO_URL", "").strip() or GUIDES_REPO_URL
