@@ -516,8 +516,8 @@ def clone_guides_as_submodule(project_path: Path, guides_repo_url: str, tracker:
 
 
 def download_template_from_github(ai_assistant: str, download_dir: Path, *, script_type: str = "sh", verbose: bool = True, show_progress: bool = True, client: httpx.Client = None, debug: bool = False) -> Tuple[Path, dict]:
-    repo_owner = "github"
-    repo_name = "spec-kit"
+    repo_owner = "yousourcephinc"
+    repo_name = "ys-spec-kit"
     if client is None:
         client = httpx.Client(verify=ssl_context)
     
