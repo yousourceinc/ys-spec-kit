@@ -1,75 +1,59 @@
-name: Publish to npm
+name: Create GitHub Release
 
 on:
   push:
-    branches: [ main ]
-    paths:
-      - 'package.json'
-      - 'bin/**'
-      - 'src/auth/**'
-      - 'scripts/**'
+    tags:
+      - 'v*.*.*'
   workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to release (e.g., v0.4.3)'
+        required: true
+        type: string
 
 jobs:
-  publish:
+  create-release:
     runs-on: ubuntu-latest
     permissions:
-      contents: read
-      packages: write
+      contents: write
+    
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-          registry-url: 'https://npm.pkg.github.com'
-          scope: '@yousourceinc'
-
-      - name: Install dependencies
-        run: npm ci || npm install
-
-      - name: Check if version is already published
-        id: check_version
+      - name: Set version from tag or input
+        id: version
         run: |
-          PACKAGE_NAME=$(node -p "require('./package.json').name")
-          PACKAGE_VERSION=$(node -p "require('./package.json').version")
-          
-          if npm view "$PACKAGE_NAME@$PACKAGE_VERSION" --registry=https://npm.pkg.github.com 2>/dev/null; then
-            echo "Version $PACKAGE_VERSION already published"
-            echo "skip=true" >> $GITHUB_OUTPUT
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            VERSION="${{ github.event.inputs.version }}"
           else
-            echo "Version $PACKAGE_VERSION not published yet"
-            echo "skip=false" >> $GITHUB_OUTPUT
+            VERSION="${GITHUB_REF#refs/tags/}"
           fi
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "Creating release for version: $VERSION"
 
-      - name: Publish to GitHub Packages
-        if: steps.check_version.outputs.skip == 'false'
+      - name: Install GitHub CLI
         run: |
-          PACKAGE_VERSION=$(node -p "require('./package.json').version")
-          
-          # Check if version contains prerelease identifiers
-          if echo "$PACKAGE_VERSION" | grep -qE '\-(alpha|beta|rc|fork|dev|pre)'; then
-            # Extract the prerelease tag (e.g., "fork" from "0.4.1-fork.1")
-            TAG=$(echo "$PACKAGE_VERSION" | sed -E 's/.*-(alpha|beta|rc|fork|dev|pre).*/\1/')
-            echo "Publishing prerelease version with tag: $TAG"
-            npm publish --tag "$TAG"
-          else
-            echo "Publishing stable version"
-            npm publish
-          fi
+          type -p gh >/dev/null || {
+            curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | sudo dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg
+            echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | sudo tee /etc/apt/sources.list.d/github-cli.list > /dev/null
+            sudo apt update
+            sudo apt install gh -y
+          }
+
+      - name: Create release packages
+        run: |
+          bash .github/workflows/scripts/create-release-packages.sh ${{ steps.version.outputs.version }}
+
+      - name: Create GitHub release
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          bash .github/workflows/scripts/create-github-release.sh ${{ steps.version.outputs.version }}
 
       - name: Summary
-        if: steps.check_version.outputs.skip == 'false'
         run: |
-          PACKAGE_NAME=$(node -p "require('./package.json').name")
-          PACKAGE_VERSION=$(node -p "require('./package.json').version")
-          echo "✅ Successfully published $PACKAGE_NAME@$PACKAGE_VERSION to GitHub Packages"
+          echo "✅ Successfully created release ${{ steps.version.outputs.version }}"
           echo ""
-          echo "Install with:"
-          echo "npm install $PACKAGE_NAME@$PACKAGE_VERSION"
+          echo "View release at:"
+          echo "https://github.com/${{ github.repository }}/releases/tag/${{ steps.version.outputs.version }}"
