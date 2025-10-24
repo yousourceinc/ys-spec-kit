@@ -243,7 +243,6 @@ The `specify` command supports the following options:
 | `--force`              | Flag     | Force merge/overwrite when initializing in current directory (skip confirmation) |
 | `--skip-tls`           | Flag     | Skip SSL/TLS verification (not recommended)                                 |
 | `--debug`              | Flag     | Enable detailed debug output for troubleshooting                            |
-| `--github-token`       | Option   | GitHub token for API requests (or set GH_TOKEN/GITHUB_TOKEN env variable)  |
 
 ### Examples
 
@@ -283,9 +282,6 @@ specify init my-project --ai gemini --no-git
 
 # Enable debug output for troubleshooting
 specify init my-project --ai claude --debug
-
-# Use GitHub token for API requests (helpful for corporate environments)
-specify init my-project --ai claude --github-token ghp_your_token_here
 
 # Check system requirements
 specify check
