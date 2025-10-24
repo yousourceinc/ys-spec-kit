@@ -24,7 +24,7 @@ SCRIPT_TYPE_CHOICES = {"sh": "POSIX Shell (bash/zsh)", "ps": "PowerShell"}
 # This is the canonical source for implementation guides that will be automatically
 # integrated into every project initialized with specify init.
 # Override: Set SPECIFY_GUIDES_REPO_URL environment variable to use a different repository.
-GUIDES_REPO_URL = "git@github.com:yousourceinc/implementation-guides.git"
+GUIDES_REPO_URL = "git@github.com:yousourcephinc/ys-requirements-list.git"
 
 # Claude CLI local installation path after migrate-installer
 CLAUDE_LOCAL_PATH = Path.home() / ".claude" / "local" / "claude"
