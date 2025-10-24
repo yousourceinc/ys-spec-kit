@@ -7,6 +7,41 @@ All notable changes to the Specify CLI will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.4.1] - 2025-10-21
+
+### Added
+
+- **Governance Layer Phase 7 - Polish & Optimization**
+  - **Comprehensive Logging**: Added logging module to all governance operations (waiver creation, compliance checking, rule evaluation)
+    - `src/specify_cli/governance/logging_config.py` for centralized setup
+    - Structured logging with appropriate levels (DEBUG, INFO, WARNING, ERROR)
+  - **Performance Metrics**: New metrics module for tracking and reporting performance
+    - `src/specify_cli/governance/metrics.py` with RuleMetrics and ComplianceCheckMetrics classes
+    - Tracks rule evaluation times, total check duration, and per-rule performance
+    - Global metrics collector for aggregating performance data
+  - **Guide Discovery Caching**: Optimized for large codebases
+    - `src/specify_cli/governance/caching.py` with GuideCacheManager
+    - MD5-based project hash for cache validation
+    - 1-hour cache expiry with automatic invalidation on project changes
+    - Significantly reduces guide discovery time on subsequent checks
+  - **Configuration Management**: Updated .gitignore for governance layer
+    - Added `compliance-report.md` (ephemeral, not committed)
+    - Added `.specify/.cache/` for cache files (not committed)
+    - Preserved `.specify/waivers.md` (version-controlled)
+
+### Changed
+
+- **Version Updates**: Updated to v0.4.1 (pyproject.toml, package.json)
+- **README.md**: Added comprehensive Governance Layer section with CLI commands and examples
+- **ComplianceChecker**: Added optional caching support (enabled by default, can be disabled with `use_cache=False`)
+
+### Technical Details
+
+- **Test Coverage**: Added 34 new tests (19 metrics + 15 caching) for 210 total tests (100% pass rate)
+- **Performance**: Compliance checks now include performance metrics reporting
+- **Logging**: All governance operations properly logged with contextual information
+- **Cache Strategy**: Intelligent cache invalidation based on file timestamps and project structure changes
+
 ## [0.4.0] - 2025-10-20
 
 ### Added

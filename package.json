@@ -1,7 +1,7 @@
 {
-  "name": "@yousourceinc/specify-cli",
-  "version": "0.4.0",
-  "description": "YourSource Specify CLI - Spec-Driven Development with OAuth authentication",
+  "name": "@yousourceinc/specify-cli-fork",
+  "version": "0.4.1-fork.1",
+  "description": "YourSource Specify CLI",
   "main": "bin/specify.js",
   "bin": {
     "specify": "./bin/specify.js"
@@ -27,7 +27,7 @@
     "url": "https://github.com/yousourceinc/ys-spec-kit.git"
   },
   "publishConfig": {
-    "access": "public",
+    "access": "restricted",
     "registry": "https://registry.npmjs.org"
   },
   "author": "YourSource",

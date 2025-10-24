@@ -52,20 +52,16 @@ import readchar
 
 # Import config module
 from .config import write_project_config, validate_division, get_valid_divisions
+
+# Import governance module
+from .governance.waiver import WaiverManager
+from .governance.compliance import ComplianceChecker
+from .governance.report import ComplianceReportGenerator
 import ssl
 import truststore
 
 ssl_context = truststore.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
 client = httpx.Client(verify=ssl_context)
-
-def _github_token(cli_token: str | None = None) -> str | None:
-    """Return sanitized GitHub token (cli arg takes precedence) or None."""
-    return ((cli_token or os.getenv("GH_TOKEN") or os.getenv("GITHUB_TOKEN") or "").strip()) or None
-
-def _github_auth_headers(cli_token: str | None = None) -> dict:
-    """Return Authorization header dict only when a non-empty token exists."""
-    token = _github_token(cli_token)
-    return {"Authorization": f"Bearer {token}"} if token else {}
 
 # Constants
 AI_CHOICES = {
@@ -541,7 +537,7 @@ def clone_guides_as_submodule(project_path: Path, guides_repo_url: str, tracker:
         return False
 
 
-def download_template_from_github(ai_assistant: str, download_dir: Path, *, script_type: str = "sh", verbose: bool = True, show_progress: bool = True, client: httpx.Client = None, debug: bool = False, github_token: str = None) -> Tuple[Path, dict]:
+def download_template_from_github(ai_assistant: str, download_dir: Path, *, script_type: str = "sh", verbose: bool = True, show_progress: bool = True, client: httpx.Client = None, debug: bool = False) -> Tuple[Path, dict]:
     repo_owner = "github"
     repo_name = "spec-kit"
     if client is None:
@@ -556,7 +552,6 @@ def download_template_from_github(ai_assistant: str, download_dir: Path, *, scri
             api_url,
             timeout=30,
             follow_redirects=True,
-            headers=_github_auth_headers(github_token),
         )
         status = response.status_code
         if status != 200:
@@ -608,7 +603,6 @@ def download_template_from_github(ai_assistant: str, download_dir: Path, *, scri
             download_url,
             timeout=60,
             follow_redirects=True,
-            headers=_github_auth_headers(github_token),
         ) as response:
             if response.status_code != 200:
                 body_sample = response.text[:400]
@@ -653,7 +647,7 @@ def download_template_from_github(ai_assistant: str, download_dir: Path, *, scri
     return zip_path, metadata
 
 
-def download_and_extract_template(project_path: Path, ai_assistant: str, script_type: str, is_current_dir: bool = False, *, verbose: bool = True, tracker: StepTracker | None = None, client: httpx.Client = None, debug: bool = False, github_token: str = None) -> Path:
+def download_and_extract_template(project_path: Path, ai_assistant: str, script_type: str, is_current_dir: bool = False, *, verbose: bool = True, tracker: StepTracker | None = None, client: httpx.Client = None, debug: bool = False) -> Path:
     """Download the latest release and extract it to create a new project.
     Returns project_path. Uses tracker if provided (with keys: fetch, download, extract, cleanup)
     """
@@ -670,8 +664,7 @@ def download_and_extract_template(project_path: Path, ai_assistant: str, script_
             verbose=verbose and tracker is None,
             show_progress=(tracker is None),
             client=client,
-            debug=debug,
-            github_token=github_token
+            debug=debug
         )
         if tracker:
             tracker.complete("fetch", f"release {meta['release']} ({meta['size']:,} bytes)")
@@ -866,7 +859,6 @@ def init(
     force: bool = typer.Option(False, "--force", help="Force merge/overwrite when using --here (skip confirmation)"),
     skip_tls: bool = typer.Option(False, "--skip-tls", help="Skip SSL/TLS verification (not recommended)"),
     debug: bool = typer.Option(False, "--debug", help="Show verbose diagnostic output for network and extraction failures"),
-    github_token: str = typer.Option(None, "--github-token", help="GitHub token to use for API requests (or set GH_TOKEN or GITHUB_TOKEN environment variable)"),
     division: str = typer.Option(None, "--division", help="Project division for AI guidance: SE, DS, Platform (defaults to SE)"),
 ):
     """
@@ -1105,7 +1097,7 @@ def init(
             local_ssl_context = ssl_context if verify else False
             local_client = httpx.Client(verify=local_ssl_context)
 
-            download_and_extract_template(project_path, selected_ai, selected_script, here, verbose=False, tracker=tracker, client=local_client, debug=debug, github_token=github_token)
+            download_and_extract_template(project_path, selected_ai, selected_script, here, verbose=False, tracker=tracker, client=local_client, debug=debug)
 
             # Ensure scripts are executable (POSIX)
             ensure_executable_scripts(project_path, tracker=tracker)
@@ -1488,6 +1480,279 @@ def update_guides():
         raise typer.Exit(1)
     except Exception as e:
         console.print(f"[red]Error updating guides:[/red] {e}")
+        raise typer.Exit(1)
+
+
+@app.command()
+def waive_requirement(
+    reason: str = typer.Argument(..., help="Reason for the waiver (max 500 characters)")
+):
+    """
+    Record a formal compliance waiver.
+    
+    Creates or appends to .specify/waivers.md with structured waiver entry including
+    reason, timestamp, and unique identifier.
+    
+    Example:
+        specify waive-requirement "Disabling MFA for service account per ticket #1234"
+    """
+    console = Console()
+    
+    try:
+        # Validate reason
+        if not reason or not reason.strip():
+            console.print("[red]Error:[/red] Waiver reason cannot be empty")
+            raise typer.Exit(1)
+        
+        if len(reason) > 500:
+            console.print("[red]Error:[/red] Waiver reason exceeds 500 character limit")
+            console.print(f"[dim]Current length: {len(reason)} characters[/dim]")
+            raise typer.Exit(1)
+        
+        # Create waiver
+        manager = WaiverManager()
+        waiver = manager.create_waiver(reason.strip())
+        
+        # Display success message
+        console.print()
+        console.print(
+            Panel(
+                f"[green]✓ Waiver recorded[/green]\n\n"
+                f"[bright_blue]ID:[/bright_blue] {waiver.waiver_id}\n"
+                f"[bright_blue]Reason:[/bright_blue] {waiver.reason}\n"
+                f"[bright_blue]Timestamp:[/bright_blue] {waiver.timestamp}",
+                title="Compliance Waiver",
+                border_style="green"
+            )
+        )
+        console.print()
+        console.print("[dim]Waiver stored in: .specify/waivers.md[/dim]")
+        
+    except Exception as e:
+        console.print(f"[red]Error creating waiver:[/red] {str(e)}")
+        raise typer.Exit(1)
+
+
+@app.command()
+def check_compliance():
+    """
+    Check code compliance against implementation guides.
+    
+    Evaluates all rules defined in implementation guides, generates a compliance
+    report with pass/fail/waived status, and cross-references waivers.
+    
+    Creates: compliance-report.md
+    
+    Example:
+        specify check-compliance
+    """
+    console = Console()
+    
+    try:
+        with console.status("[bold cyan]Discovering guides...") as status:
+            checker = ComplianceChecker()
+            guides = checker._discover_guides()
+        
+        if not guides:
+            console.print("[yellow]⚠[/yellow]  No implementation guides found")
+            console.print("[dim]Looking in: context/references/, specs/[/dim]")
+            raise typer.Exit(1)
+        
+        console.print(f"[dim]Found {len(guides)} guide(s)[/dim]")
+        
+        # Run compliance check
+        with console.status("[bold cyan]Checking compliance...") as status:
+            results = checker.run_compliance_check(guides)
+        
+        # Count statuses
+        from .governance.compliance import RuleStatus
+        pass_count = sum(1 for r in results if r.status == RuleStatus.PASS)
+        fail_count = sum(1 for r in results if r.status == RuleStatus.FAIL)
+        waived_count = sum(1 for r in results if r.status == RuleStatus.WAIVED)
+        error_count = sum(1 for r in results if r.status == RuleStatus.ERROR)
+        
+        # Display results
+        console.print()
+        console.print("[bold]Compliance Check Results[/bold]")
+        console.print(f"  ✅ Passed: {pass_count}")
+        console.print(f"  ❌ Failed: {fail_count}")
+        console.print(f"  🚫 Waived: {waived_count}")
+        console.print(f"  ⚠️ Errors: {error_count}")
+        
+        # Generate and write report
+        with console.status("[bold cyan]Generating report...") as status:
+            generator = ComplianceReportGenerator()
+            report_path = generator.generate_and_write_report(
+                results,
+                project_name=Path.cwd().name
+            )
+        
+        console.print()
+        console.print(
+            Panel(
+                f"[green]✓ Report generated[/green]\n\n"
+                f"[bright_blue]Location:[/bright_blue] {report_path.relative_to(Path.cwd())}\n"
+                f"[bright_blue]Rules Checked:[/bright_blue] {len(results)}\n"
+                f"[bright_blue]Status:[/bright_blue] ",
+                title="Compliance Check Complete",
+                border_style="green" if fail_count == 0 else "yellow"
+            )
+        )
+        
+        # Determine exit code based on failures
+        if fail_count > 0:
+            console.print("[yellow]⚠ Some rules failed - see report for details[/yellow]")
+            raise typer.Exit(1)
+        elif error_count > 0:
+            console.print("[yellow]⚠ Some errors occurred during evaluation[/yellow]")
+            raise typer.Exit(1)
+        else:
+            console.print("[green]✓ All rules passed![/green]")
+    
+    except Exception as e:
+        console.print(f"[red]Error during compliance check:[/red] {str(e)}")
+        raise typer.Exit(1)
+
+
+# Waivers subcommand group
+waivers_app = typer.Typer(
+    name="waivers",
+    help="Manage compliance waivers",
+    add_completion=False,
+)
+app.add_typer(waivers_app)
+
+
+@waivers_app.command()
+def list(
+    verbose: bool = typer.Option(False, "--verbose", "-v", help="Show detailed information"),
+):
+    """
+    List all active compliance waivers.
+    
+    Displays all waivers in chronological order with ID, reason, and timestamp.
+    Use --verbose for full details including related rules.
+    
+    Example:
+        specify waivers list
+        specify waivers list --verbose
+    """
+    console = Console()
+    
+    try:
+        manager = WaiverManager()
+        waivers = manager.list_waivers()
+        
+        if not waivers:
+            console.print("[yellow]⚠[/yellow]  No waivers found")
+            console.print("[dim]Run 'specify waive-requirement' to create a waiver[/dim]")
+            return
+        
+        console.print(f"\n[bold]Compliance Waivers[/bold] ({len(waivers)} total)\n")
+        
+        if verbose:
+            # Show detailed view with all waiver information
+            for waiver in waivers:
+                panel_content = (
+                    f"[bright_blue]ID:[/bright_blue] {waiver.waiver_id}\n"
+                    f"[bright_blue]Reason:[/bright_blue] {waiver.reason}\n"
+                    f"[bright_blue]Timestamp:[/bright_blue] {waiver.timestamp}"
+                )
+                
+                if waiver.created_by:
+                    panel_content += f"\n[bright_blue]Created By:[/bright_blue] {waiver.created_by}"
+                
+                if waiver.related_rules:
+                    rules_str = ", ".join(waiver.related_rules)
+                    panel_content += f"\n[bright_blue]Related Rules:[/bright_blue] {rules_str}"
+                
+                console.print(
+                    Panel(
+                        panel_content,
+                        title=f"Waiver {waiver.waiver_id}",
+                        border_style="bright_blue",
+                    )
+                )
+                console.print()
+        else:
+            # Show table view for quick overview
+            table = Table(title="Active Waivers", show_header=True, header_style="bold bright_blue")
+            table.add_column("ID", style="cyan")
+            table.add_column("Reason", style="white", max_width=60)
+            table.add_column("Timestamp", style="dim")
+            
+            for waiver in waivers:
+                # Truncate reason if too long
+                reason = waiver.reason[:57] + "..." if len(waiver.reason) > 60 else waiver.reason
+                table.add_row(waiver.waiver_id, reason, waiver.timestamp)
+            
+            console.print(table)
+            console.print()
+            console.print("[dim]Use 'specify waivers show <id>' for detailed information[/dim]")
+            console.print("[dim]Use 'specify waivers list --verbose' to see all details[/dim]")
+    
+    except Exception as e:
+        console.print(f"[red]Error listing waivers:[/red] {str(e)}")
+        raise typer.Exit(1)
+
+
+@waivers_app.command()
+def show(
+    waiver_id: str = typer.Argument(..., help="Waiver ID to display (e.g., W-001)"),
+):
+    """
+    Display detailed information about a specific waiver.
+    
+    Shows the waiver reason, timestamp, related rules, and creation metadata.
+    
+    Example:
+        specify waivers show W-001
+    """
+    console = Console()
+    
+    try:
+        # Validate waiver ID format
+        if not waiver_id.startswith("W-"):
+            console.print("[red]Error:[/red] Waiver ID must start with 'W-' (e.g., W-001)")
+            raise typer.Exit(1)
+        
+        manager = WaiverManager()
+        waiver = manager.get_waiver_by_id(waiver_id)
+        
+        if not waiver:
+            console.print(f"[red]Error:[/red] Waiver {waiver_id} not found")
+            console.print("[dim]Run 'specify waivers list' to see all waivers[/dim]")
+            raise typer.Exit(1)
+        
+        # Display waiver details
+        console.print()
+        panel_content = (
+            f"[bright_blue]ID:[/bright_blue] {waiver.waiver_id}\n\n"
+            f"[bright_blue]Reason:[/bright_blue]\n{waiver.reason}\n\n"
+            f"[bright_blue]Timestamp:[/bright_blue] {waiver.timestamp}"
+        )
+        
+        if waiver.created_by:
+            panel_content += f"\n\n[bright_blue]Created By:[/bright_blue] {waiver.created_by}"
+        
+        if waiver.related_rules:
+            rules_str = ", ".join(waiver.related_rules)
+            panel_content += f"\n\n[bright_blue]Related Rules:[/bright_blue]\n{rules_str}"
+        
+        console.print(
+            Panel(
+                panel_content,
+                title=f"Waiver Details: {waiver.waiver_id}",
+                border_style="bright_blue",
+                expand=False,
+            )
+        )
+        console.print()
+    
+    except typer.Exit:
+        raise
+    except Exception as e:
+        console.print(f"[red]Error retrieving waiver:[/red] {str(e)}")
         raise typer.Exit(1)
 
 

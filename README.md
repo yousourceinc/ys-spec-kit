@@ -243,7 +243,6 @@ The `specify` command supports the following options:
 | `--force`              | Flag     | Force merge/overwrite when initializing in current directory (skip confirmation) |
 | `--skip-tls`           | Flag     | Skip SSL/TLS verification (not recommended)                                 |
 | `--debug`              | Flag     | Enable detailed debug output for troubleshooting                            |
-| `--github-token`       | Option   | GitHub token for API requests (or set GH_TOKEN/GITHUB_TOKEN env variable)  |
 
 ### Examples
 
@@ -283,9 +282,6 @@ specify init my-project --ai gemini --no-git
 
 # Enable debug output for troubleshooting
 specify init my-project --ai claude --debug
-
-# Use GitHub token for API requests (helpful for corporate environments)
-specify init my-project --ai claude --github-token ghp_your_token_here
 
 # Check system requirements
 specify check
@@ -334,6 +330,76 @@ specify init my-project --ai claude
 ```
 
 **Note**: Guide repository configuration (add/remove) is handled at the binary/system level and cannot be modified by developers at runtime. Developers can only update existing guides to the latest version.
+
+### Governance Layer
+
+The Specify CLI includes a **governance layer** for managing compliance, waivers, and rule validation across your project:
+
+#### Compliance Checking
+
+Run compliance checks against your implementation guides to ensure adherence to defined rules:
+
+```bash
+specify check-compliance [--guides GUIDE_PATHS] [--no-cache]
+```
+
+**Features:**
+- Discover and evaluate rules from implementation guides
+- Cross-reference with active waivers
+- Generate compliance reports with detailed metrics
+- Performance metrics tracking (rule evaluation times, total duration)
+- Guide caching for large codebases (1-hour expiry)
+
+#### Waiver Management
+
+Create and manage compliance exceptions with full audit trail:
+
+```bash
+# Create a new waiver
+specify waive-requirement "Reason for exception" [--rules RULE_IDS]
+
+# List all active waivers
+specify waivers list [--verbose]
+
+# View details for a specific waiver
+specify waivers show W-001
+```
+
+**Features:**
+- Version-controlled waiver storage (`.specify/waivers.md`)
+- Immutable audit trail with timestamps
+- Division-aware waiver tracking
+- Rich console formatting for waiver display
+
+#### Rule Authoring
+
+Define compliance rules in your implementation guides using YAML frontmatter:
+
+```markdown
+---
+rules:
+  - id: "RULE-001"
+    type: "file_exists"
+    path: "src/index.js"
+    division: "SE"
+    description: "Ensure main entry point exists"
+  
+  - id: "RULE-002"
+    type: "text_includes"
+    target: "package.json"
+    text: '"scripts"'
+    description: "Ensure npm scripts defined"
+---
+
+# My Implementation Guide
+```
+
+**Supported rule types:**
+- `file_exists`: Verify required files are present
+- `dependency_present`: Check for required dependencies
+- `text_includes`: Validate text content in files
+
+For detailed governance layer documentation and quickstart guide, see [Governance Layer Quickstart](./docs/governance-quickstart.md).
 
 ### Environment Variables
 
