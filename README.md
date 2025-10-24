@@ -8,7 +8,7 @@
     <strong>An effort to allow organizations to focus on product scenarios rather than writing undifferentiated code with the help of Spec-Driven Development.</strong>
 </p>
 
-[![Release](https://github.com/github/spec-kit/actions/workflows/release.yml/badge.svg)](https://github.com/github/spec-kit/actions/workflows/release.yml)
+[![Release](https://github.com/yousourcephinc/ys-spec-kit/actions/workflows/release.yml/badge.svg)](https://github.com/yousourcephinc/ys-spec-kit/actions/workflows/release.yml)
 
 ---
 
@@ -47,7 +47,7 @@ Choose your preferred installation method:
 Install via npm with automatic GitHub OAuth authentication:
 
 ```bash
-npm install -g @your-org/specify-cli
+npm install -g @yousourcephinc/specify-cli
 ```
 
 Then use the tool directly:
@@ -68,7 +68,7 @@ specify check
 Install once and use everywhere:
 
 ```bash
-uv tool install specify-cli --from git+https://github.com/github/spec-kit.git
+uv tool install specify-cli --from git+https://github.com/yousourcephinc/ys-spec-kit.git
 ```
 
 Then use the tool directly:
@@ -83,7 +83,7 @@ specify check
 Run directly without installing:
 
 ```bash
-uvx --from git+https://github.com/github/spec-kit.git specify init <PROJECT_NAME>
+uvx --from git+https://github.com/yousourcephinc/ys-spec-kit.git specify init <PROJECT_NAME>
 ```
 
 **Benefits of persistent installation:**
@@ -92,6 +92,30 @@ uvx --from git+https://github.com/github/spec-kit.git specify init <PROJECT_NAME
 - No need to create shell aliases
 - Better tool management with `uv tool list`, `uv tool upgrade`, `uv tool uninstall`
 - Cleaner shell configuration
+
+#### Uninstalling
+
+To uninstall the Specify CLI:
+
+**If installed via npm:**
+```bash
+npm uninstall -g @yousourcephinc/specify-cli
+```
+
+**If installed via uv:**
+```bash
+uv tool uninstall specify-cli
+```
+
+**Clean up configuration files (optional):**
+```bash
+# Remove npm configuration for GitHub Packages
+sed -i.bak '/@yousourcephinc:registry/d' ~/.npmrc
+sed -i.bak '/npm.pkg.github.com/d' ~/.npmrc
+
+# Remove cached credentials (if using OAuth)
+rm -rf ~/.specify-cli/
+```
 
 ### 2. Establish project principles
 
@@ -216,6 +240,23 @@ For detailed OAuth setup instructions, see [OAuth Setup Guide](./docs/OAUTH_SETU
 
 **For Teams:** See [Team Installation Guide](./docs/TEAM_INSTALLATION.md) for complete onboarding instructions.
 
+### Continuous Deployment
+
+The package is automatically published to GitHub Packages when changes are pushed to the `main` branch. The workflow:
+
+- ✅ Triggers on pushes to `main` when `package.json`, `bin/`, `src/auth/`, or `scripts/` change
+- ✅ Checks if the version is already published (prevents duplicate publishes)
+- ✅ Auto-detects prerelease versions (e.g., `-alpha`, `-beta`, `-rc`) and tags appropriately
+- ✅ Publishes stable versions to the `latest` tag
+- ✅ Can be manually triggered via GitHub Actions workflow dispatch
+
+**To publish a new version:**
+1. Update version in `package.json`: `npm version patch` (or `minor`, `major`)
+2. Commit and push to `main`: `git push origin main`
+3. GitHub Actions automatically publishes the new version
+
+See `.github/workflows/publish-npm.yml` for the complete workflow configuration.
+
 ## 🔧 Specify CLI Reference
 
 The `specify` command supports the following options:
@@ -228,6 +269,10 @@ The `specify` command supports the following options:
 | `check`     | Check for installed tools (`git`, `claude`, `gemini`, `code`/`code-insiders`, `cursor-agent`, `windsurf`, `qwen`, `opencode`, `codex`) |
 | `logout`    | Clear GitHub OAuth authentication and remove stored token      |
 | `guides update` | Update implementation guides to the latest version using git submodule |
+| `check-compliance` | Run compliance checks against implementation guides (see [Governance Layer](#governance-layer)) |
+| `waive-requirement` | Create a compliance waiver with audit trail (see [Governance Layer](#governance-layer)) |
+| `waivers list` | List all active compliance waivers (see [Governance Layer](#governance-layer)) |
+| `waivers show` | Show details for a specific waiver (see [Governance Layer](#governance-layer)) |
 
 ### `specify init` Arguments & Options
 
@@ -300,6 +345,9 @@ After running `specify init`, your AI coding agent will have access to these sla
 | `/tasks`        | Generate actionable task lists for implementation                     |
 | `/analyze`      | Cross-artifact consistency & coverage analysis (run after /tasks, before /implement) |
 | `/implement`    | Execute all tasks to build the feature according to the plan         |
+| `/audit`        | Run compliance checks against implementation guides (wraps `specify check-compliance`) |
+| `/waive`        | Create compliance waivers with audit trail (wraps `specify waive-requirement`) |
+| `/waivers`      | List and view active compliance waivers (wraps `specify waivers list/show`) |
 
 ### Guides Management (CLI)
 
@@ -795,7 +843,7 @@ rm gcm-linux_amd64.2.6.1.deb
 
 ## 💬 Support
 
-For support, please open a [GitHub issue](https://github.com/github/spec-kit/issues/new). We welcome bug reports, feature requests, and questions about using Spec-Driven Development.
+For support, please open a [GitHub issue](https://github.com/yousourcephinc/ys-spec-kit/issues/new). We welcome bug reports, feature requests, and questions about using Spec-Driven Development.
 
 ## 🙏 Acknowledgements
 
